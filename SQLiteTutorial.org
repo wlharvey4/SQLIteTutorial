@@ -1,0 +1,817 @@
+# -*- mode:org; fill-column:79; -*-
+#+title:SQLite Tutorial
+#+subtitle:{{{version}}}
+#+date:2019-06-05 23:29
+#+macro:version Version 0.0.1 {{{date}}}
+* Introduction
+- [[https://www.sqlite.org/index.html][SQLite Home]]
+- [[https://www.sqlite.org/docs.html][SQLite Documentation]]
+- [[https://www.sqlite.org/download.html][SQLite Download Page]]
+- [[http://www.sqlitetutorial.net][SQLite Tutorial Home]]
+- [[https://sqlite.org/src/doc/trunk/README.md][SQLite Source Repository and Compilation]]
+- *Latest Release*: Version 3.28.0 (2019-04-16)
+
+
+#+begin_src sh :results output :exports results
+echo SQLite installed version:
+sqlite3 --version
+#+end_src
+
+*SQLite* is an /open source/, /zero-configuration/, /self-contained/,
+/stand-alone/, /transaction/ relational database engine designed to be
+/embedded/ into an application.
+
+This SQLite tutorial teaches you everything you need to know to start
+using SQLite effectively. You will learn SQLite through extensive
+hands-on practices.
+
+* About the SQLite Tutorial
+- http://www.sqlitetutorial.net
+
+SQLite Tutorial website helps you master SQLite quickly and easily. It explains
+the complex concepts in simple and easy-to-understand ways so that you can both
+understand SQLite fast and know how to apply it in your software development
+work more effectively.
+
+* Getting started with SQLite
+You should go through this section if this is the first time you have worked
+with SQLite.  Follow these 3-easy steps to get started with SQLite fast.
+
+- First, we help you answer the first important question: [[http://www.sqlitetutorial.net/what-is-sqlite/][what is SQLite]]?  You
+  will have a brief overview of SQLite before you start working with it.
+
+- Second, we show you step by step how to [[http://www.sqlitetutorial.net/download-install-sqlite/][download and install SQLite GUI tool]]
+  on your computer.
+
+- Third, we introduce you to an [[http://www.sqlitetutorial.net/sqlite-sample-database/][SQLite sample database]] and walk you through the
+  steps of using the sample database for practicing.
+
+** What is SQLite
+- http://www.sqlitetutorial.net/what-is-sqlite/
+
+*Summary*: this tutorial gives you a brief overview of SQLite and the SQLite’s
+distinctive features that make SQLite the most widely deployed SQL database
+engine.
+
+SQLite is a software library that provides a relational database management
+system.  The /lite/ in SQLite means light weight in terms of setup, database
+administration, and required resource.
+
+SQLite has the following noticeable features:
+- self-contained,
+- serverless,
+- zero-configuration,
+- transactional
+
+
+SQLite is a C-language library that implements a small, fast, self-contained,
+high-reliability, full-featured, SQL database engine.  The SQLite file format
+is stable, cross-platform, and backwards compatible.  SQLite database files are
+commonly used as containers to transfer rich content between systems and as a
+long-term archival format for data.
+
+
+*** Serverless
+#+cindex:serverless
+#+cindex:RDBMS
+#+cindex:MySQL
+#+cindex:PostgreSQL
+#+cindex:TCP/IP
+#+cindex:client/server architecture
+Normally, an RDBMS such as MySQL, PostgreSQL, etc., requires a separate server
+process to operate.  The applications that want to access the database server
+use TCP/IP protocol to send and receive requests.  This is called client/server
+architecture.
+
+The following diagram illustrates the RDBMS client/server architecture:
+
+#+caption:RDMBS Client-Server Architecture
+#+name:fig:client-server-arch
+[[file:figs/RDBMS-Client-Server-Architecture.jpg]]
+
+*SQLite does NOT work this way.* SQLite does *NOT* require a server to run.
+
+SQLite database is integrated with the application that accesses the database.
+The applications interact with the SQLite database to read and write directly
+from the database files stored on disk.
+
+The following diagram illustrates the SQLite server-less architecture:
+
+#+caption:SQLite Serverless Architecture
+#+name:fig:sqlite-serverless-arch
+[[file:figs/What-is-SQLite.jpg]]
+
+*** Detailed Description of Features
+- [[https://www.sqlite.org/features.html][Features]]
+- [[https://www.sqlite.org/omitted.html][Omitted Features]]
+
+
+  #+cindex:transactions, ACID
+  #+cindex:ACID transactions
+- Transactions are /atomic/, /consistent/, /isolated/, and /durable/ (*ACID*)
+  even after system crashes and power failures.
+
+  #+cindex:zero-configuration
+  #+cindex:configuration, none
+- *Zero-configuration* --- no setup or administration needed.
+
+  #+cindex:indexes, partial, on expressions
+  #+cindex:JSON
+  #+cindex:table expressions
+  #+cindex:window functions
+- Full-featured SQL implementation with advanced capabilities like /partial
+  indexes/, /indexes on expressions/, /JSON/, /common table expressions/, and /window
+  functions/.
+
+  #+cindex:application file format
+- A complete database is stored in a *single cross-platform disk file*.  Great
+  for use as an [[https://www.sqlite.org/appfileformat.html][application file format]].[fn::An "application file format" is
+  the file format used to persist application state to disk or to exchange
+  information between programs.]
+
+  #+cindex:terabyte-sized databases
+  #+cindex:gigabyte-sized strings, blobs
+- Supports *terabyte-sized databases* and gigabyte-sized strings and blobs.
+
+  #+cindex:small footprint
+- *Small code footprint*: less than 600KiB fully configured or much less with
+  optional features omitted.
+
+  #+cindex:API
+- Simple, easy to use *API*.
+
+  #+cindex:fast
+- *Fast*: In some cases, SQLite is faster than direct filesystem I/O
+
+  #+cindex:ANSI-C
+  #+cindex:TCL bindings
+- Written in *ANSI-C*. TCL bindings included.  Bindings for dozens of other
+  languages available separately.
+
+  #+cindex:source code well commented
+- Well-commented *source code* with 100% branch test coverage.
+
+  #+cindex:compile source code
+- Available as a single *ANSI-C source-code file* that is easy to compile and
+  hence is easy to add into a larger project.
+
+  #+cindex:dependencies, none
+  #+cindex:self-contained
+- *Self-contained*: no external dependencies.
+
+  #+cindex:cross-platform
+  #+cindex:Android
+  #+cindex:BSD
+  #+cindex:iOS
+  #+cindex:Linux
+  #+cindex:Mac
+  #+cindex:Solaris
+  #+cindex:VxWorks
+  #+cindex:Windows
+- Cross-platform: Android, *BSD, iOS, Linux, Mac, Solaris, VxWorks, and Windows
+  (Win32, WinCE, WinRT) are supported out of the box.  Easy to port to other
+  systems.
+
+  #+cindex:public domain
+- Sources are in the *public domain*.  Use for any purpose.
+
+  #+cindex:command-line interface (CLI)
+  #+cindex:CLI, command-line interface
+- Comes with a standalone command-line interface (CLI) client that can be used
+  to administer SQLite databases.
+
+*** Self-Contained
+#+cindex:self-contained
+#+cindex:iPhone
+#+cindex:Android
+#+cindex:game consoles
+#+cindex:handheld media players
+"SQLite is self-contained" means it requires minimal support from the operating
+system or external library.  This makes SQLite usable in any environments---
+especially in embedded devices like iPhones, Android phones, game consoles,
+handheld media players, etc.
+
+#+cindex:ANSI-C
+#+cindex:source files
+#+cindex:compile into code
+SQLite is developed using ANSI-C.  The source code is available as a big
+~sqlite3.c~ and its header file ~sqlite3.h~.  If you want to develop an
+application that uses SQLite, you just need to drop these files into your
+project and compile it with your code.
+
+*** Zero-configuration
+#+cindex:zero configuration
+#+cindex:configuration files, none
+Because of the serverless architecture, you don’t need to “install” SQLite
+before using it.  There is no server process that needs to be configured,
+started, and stopped.
+
+In addition, SQLite does not use any configuration files.
+
+*** Transactional
+#+cindex:transactions
+#+cindex:ACID-compliant
+#+cindex:atomic
+#+cindex:consistent
+#+cindex:isolated
+#+cindex:durable
+All transactions in SQLite are fully ACID-compliant.  It means all queries and
+changes are Atomic, Consistent, Isolated, and Durable.  In other words, all
+changes within a transaction take place completely or not at all even when an
+unexpected situation like application crash, power failure, or operating system
+crash occurs.
+
+*** SQLite distinctive features
+#+cindex:dynamic types
+#+cindex:data types, dynamic
+SQLite uses dynamic types for tables.  It means you can store any value in any
+column, regardless of the data type.
+
+#+cindex:single database connection
+#+cindex:connection, single
+SQLite allows a single database connection to access multiple database files
+simultaneously.  This brings many nice features like joining tables in different
+databases or copying data between databases in a single command.
+
+#+cindex:in-memory database
+SQLite is capable of creating in-memory databases which are very fast to work
+with.
+
+*** SQLite is NOT Client-Server SQL
+SQLite is not directly comparable to client/server SQL database engines such as
+MySQL, Oracle, PostgreSQL, or SQL Server since SQLite is trying to solve a
+different problem.
+
+#+cindex:shared repository
+*Client/server SQL database engines* strive to implement a /shared repository/ of
+enterprise data.  They emphasize 
+- scalability,
+- concurrency,
+- centralization, and
+- control.
+
+
+#+cindex:local data storage
+*SQLite* strives to provide /local data storage/ for individual applications
+and devices.  SQLite emphasizes 
+- economy,
+- efficiency,
+- reliability,
+- independence, and
+- simplicity.
+
+
+#+cindex:@code{fopen()}
+SQLite does not compete with client/server databases.  SQLite competes with
+~fopen()~.
+
+** Use Cases for SQLite
+
+For device-local storage with low writer concurrency and less than a terabyte
+of content, SQLite is almost always a better solution than using a
+client-server RDBMS.  SQLite is fast and reliable and it requires no
+configuration or maintenance.  It keeps thing simple.  SQLite "just works".
+
+#+cindex:use cases
+#+cindex:embedded devices
+- Embedded devices and the internet of things ::
+
+
+  #+cindex:application file format
+- Application file format ::
+
+     SQLite is often used as the on-disk file format for desktop applications
+     such as:
+
+  - version control systems,
+
+  - financial analysis tools,
+
+  - media cataloging and editing suites,
+
+  - CAD packages,
+
+  - record keeping programs,
+
+    #+cindex:@code{sqlite3_open()}
+    #+cindex:File/Open operation
+    #+cindex:File/Save menu
+    and so forth.  The traditional File/Open operation calls ~sqlite3_open()~
+    to attach to the database file.  Updates happen automatically as
+    application content is revised so the File/Save menu option becomes
+    superfluous.  The =File/Save_As= menu option can be implemented using the
+    backup API.  There are many benefits to this approach, including improved
+    performance, reduced cost and complexity, and improved reliability.
+
+  #+cindex:websites
+- Websites ::
+
+              SQLite works great as the database engine for most low to medium
+              traffic websites (which is to say, most websites).  The amount of
+              web traffic that SQLite can handle depends on how heavily the
+              website uses its database.  Generally speaking, any site that
+              gets fewer than 100K hits/day should work fine with SQLite.  The
+              100K hits/day figure is a conservative estimate, not a hard upper
+              bound.  SQLite has been demonstrated to work with 10 times that
+              amount of traffic.
+
+  #+cindex:data analysis
+- Data analysis ::
+
+                   #+cindex:command-line shell
+                   #+cindex:TCL
+                   #+cindex:Python
+                   #+cindex:R
+                   People who understand SQL can employ the sqlite3
+                   command-line shell (or various third-party SQLite access
+                   programs) to analyze large datasets.  Raw data can be
+                   imported from CSV files, then that data can be sliced and
+                   diced to generate a myriad of summary reports.  More complex
+                   analysis can be done using simple scripts written in Tcl or
+                   Python (both of which come with SQLite built-in) or in R or
+                   other languages using readily available adaptors.
+
+                   The same thing can be done with an enterprise client/server
+                   database, of course.  The advantage of SQLite is that it is
+                   easier to install and use and the resulting database is a
+                   single file that can be written to a USB memory stick or
+                   emailed to a colleague.
+
+- Cache for enterprise data ::
+
+  #+cindex:server-side database
+- Server-side database ::
+
+     #+cindex:data store
+     Systems designers report success using SQLite as a data store on server
+     applications running in the datacenter, or in other words, using SQLite as
+     the underlying storage engine for an application-specific database server.
+
+     With this pattern, the overall system is still client/server: clients send
+     requests to the server and get back replies over the network. But instead
+     of sending generic SQL and getting back raw table content, the client
+     requests and server responses are high-level and application-specific. The
+     server translates requests into multiple SQL queries, gathers the results,
+     does post-processing, filtering, and analysis, then constructs a
+     high-level reply containing only the essential information.
+
+- Data transfer format ::
+
+     #+cindex:cross-platform format
+     Because an SQLite database is a single compact file in a well-defined
+     cross-platform format, it is often used as a container for transferring
+     content from one system to another.  The sender gathers content into an
+     SQLite database file, transfers that one file to the receiver, then the
+     receiver uses SQL to extract the content as needed.
+
+  #+cindex:file archive
+- File archive and/or data container ::
+
+     #+cindex:SQLite Archive
+     #+cindex:ZIP archives
+     #+cindex:incremental update
+     #+cindex:metadata, rich
+     The [[https://www.sqlite.org/sqlar.html][SQLite Archive]] idea shows how SQLite can be used as a substitute for
+     ZIP archives or Tarballs.  An archive of files stored in SQLite is only
+     very slightly larger, and in some cases actually smaller, than the
+     equivalent ZIP archive.  And an SQLite archive features incremental and
+     atomic updating and the ability to store much richer metadata.
+
+     #+cindex:network transfer
+     SQLite is a good solution for any situation that requires bundling diverse
+     content into a self-contained and self-describing package for shipment
+     across a network.  Content is encoding in a well-defined, cross-platform,
+     and stable file format.  The encoding is efficient, and receivers can
+     extract small subsets of the content without having to read and parse the
+     entire file.
+
+  #+cindex:disk files, ad hoc
+- Replacement for ad hoc disk files ::
+
+
+  #+cindex:internal database
+- Internal or temporary databases ::
+
+     For programs that have a lot of data that must be sifted and sorted in
+     diverse ways, it is often easier and quicker to load the data into an
+     in-memory SQLite database and use queries with joins and ORDER BY clauses
+     to extract the data in the form and order needed rather than to try to
+     code the same operations manually.  Using an SQL database internally in
+     this way also gives the program greater flexibility since new columns and
+     indices can be added without having to recode every query.
+
+- Stand-in for an enterprise database during demos or testing ::
+
+
+- Education and Training ::
+
+
+- Experimental SQL language extensions ::
+
+** Download and Install SQLite
+
+#+cindex:download SQLite
+#+cindex:install SQLite
+*Summary*: This tutorial shows you step by step how to download and install
+SQLite on your computer.
+
+{{{heading(Download SQLite)}}}
+
+1. First, go to the https://www.sqlite.org website.
+2. Second, open the download page https://www.sqlite.org/download.html
+
+
+#+cindex:platforms
+SQLite provides various versions for various platforms e.g., Windows, Linux,
+and Mac.  You should choose an appropriate version to download.
+
+{{{heading(Install SQLite)}}}
+
+#+cindex:install SQLite
+#+cindex:@file{sqlite3.exe}
+1. First, create a new folder e.g., ~/usr/local/sqlite~.
+2. Second, extract the content of the file that you downloaded in the previous
+   section to the ~/usr/local/sqlite~ folder.  You should see the ~sqlite3.exe~
+   is in the ~/usr/local/sqlite~ folder.
+
+
+{{{subheading(Working With the Installation)}}}
+
+1. First, open the command line window and navigate to the ~/usr/local/sqlite~
+   folder.
+
+2. Second, type =sqlite3= and press enter, you should see the following output:
+
+   #+begin_example
+   ? sqlite3
+   SQLite version 3.28.0 2019-04-16 19:49:53
+   Enter ".help" for usage hints.
+   Connected to a transient in-memory database.
+   Use ".open FILENAME" to reopen on a persistent database.
+   sqlite>
+   #+end_example
+
+3. Third, you can type the ~.help~ command from the =sqlite>= prompt to see all
+   available commands in sqlite3.
+
+   #+begin_example
+   sqlite> .help
+   .archive ...             Manage SQL archives
+   .auth ON|OFF             Show authorizer callbacks
+   .backup ?DB? FILE        Backup DB (default "main") to FILE
+   .bail on|off             Stop after hitting an error.  Default OFF
+   .binary on|off           Turn binary output on or off.  Default OFF
+   .cd DIRECTORY            Change the working directory to DIRECTORY
+   .changes on|off          Show number of rows changed by SQL
+   .check GLOB              Fail if output since .testcase does not match
+   .clone NEWDB             Clone data into NEWDB from the existing database
+   .databases               List names and files of attached databases
+   .dbconfig ?op? ?val?     List or change sqlite3_db_config() options
+   .dbinfo ?DB?             Show status information about the database
+   .dump ?TABLE? ...        Render all database content as SQL
+   .echo on|off             Turn command echo on or off
+   .eqp on|off|full|...     Enable or disable automatic EXPLAIN QUERY PLAN
+   .excel                   Display the output of next command in a spreadsheet
+   .exit ?CODE?             Exit this program with return-code CODE
+   .expert                  EXPERIMENTAL. Suggest indexes for specified queries
+   .fullschema ?--indent?   Show schema and the content of sqlite_stat tables
+   .headers on|off          Turn display of headers on or off
+   .help ?-all? ?PATTERN?   Show help text for PATTERN
+   .import FILE TABLE       Import data from FILE into TABLE
+   .imposter INDEX TABLE    Create imposter table TABLE on index INDEX
+   .indexes ?TABLE?         Show names of indexes
+   .limit ?LIMIT? ?VAL?     Display or change the value of an SQLITE_LIMIT
+   .lint OPTIONS            Report potential schema issues.
+   .load FILE ?ENTRY?       Load an extension library
+   .log FILE|off            Turn logging on or off.  FILE can be stderr/stdout
+   .mode MODE ?TABLE?       Set output mode
+   .nullvalue STRING        Use STRING in place of NULL values
+   .once (-e|-x|FILE)       Output for the next SQL command only to FILE
+   .open ?OPTIONS? ?FILE?   Close existing database and reopen FILE
+   .output ?FILE?           Send output to FILE or stdout if FILE is omitted
+   .parameter CMD ...       Manage SQL parameter bindings
+   .print STRING...         Print literal STRING
+   .progress N              Invoke progress handler after every N opcodes
+   .prompt MAIN CONTINUE    Replace the standard prompts
+   .quit                    Exit this program
+   .read FILE               Read input from FILE
+   .restore ?DB? FILE       Restore content of DB (default "main") from FILE
+   .save FILE               Write in-memory database into FILE
+   .scanstats on|off        Turn sqlite3_stmt_scanstatus() metrics on or off
+   .schema ?PATTERN?        Show the CREATE statements matching PATTERN
+   .selftest ?OPTIONS?      Run tests defined in the SELFTEST table
+   .separator COL ?ROW?     Change the column and row separators
+   .sha3sum ...             Compute a SHA3 hash of database content
+   .shell CMD ARGS...       Run CMD ARGS... in a system shell
+   .show                    Show the current values for various settings
+   .stats ?on|off?          Show stats or turn stats on or off
+   .system CMD ARGS...      Run CMD ARGS... in a system shell
+   .tables ?TABLE?          List names of tables matching LIKE pattern TABLE
+   .testcase NAME           Begin redirecting output to 'testcase-out.txt'
+   .timeout MS              Try opening locked tables for MS milliseconds
+   .timer on|off            Turn SQL timer on or off
+   .trace ?OPTIONS?         Output each SQL statement as it is run
+   .vfsinfo ?AUX?           Information about the top-level VFS
+   .vfslist                 List all available VFSes
+   .vfsname ?AUX?           Print the name of the VFS stack
+   .width NUM1 NUM2 ...     Set column widths for "column" mode
+   sqlite>
+   #+end_example
+
+- Fourth, to quit the =sqlite>=, you use  ~.quit~ command.
+
+** The SQLite Studio GUI Tool
+
+*** About SQLite Studio
+#+cindex:SQLite Studio GUI tool
+#+cindex:GUI tool
+- [[https://github.com/pawelsalawa/sqlitestudio/wiki][Wiki]]
+- [[https://github.com/pawelsalawa/sqlitestudio/wiki/User_Manual][User Manual]]
+
+SQLiteStudio is a SQLite database manager with the following features:
+
+- Portable :: no need to install or uninstall. Just download, unpack and run.
+- Intuitive interface ::
+- Powerful, yet light and fast ::
+- All SQLite3 and SQLite2 features wrapped within simple GUI ::
+- Cross-platform :: runs on Windows 9x/2k/XP/2003/Vista/7, Linux, MacOS X and
+  should work on other Unixes (not tested yet)
+- Exporting to various formats :: SQL statements, CSV, HTML, XML, PDF, JSON
+- Importing data from various formats :: CSV, custom text files [regular
+  expressions]
+- Numerous small additions :: like formatting code, history of queries executed
+     in editor windows, on-the-fly syntax checking, and more,
+- Unicode support ::
+- Skinnable :: interface can look native for Windows 9x/XP, KDE, GTK, Mac OS X,
+               or draw widgets to fit for other environments, WindowMaker,
+               etc),
+- Configurable colors, fonts and shortcuts ::
+- Open source and free :: Released under GPLv3 license
+
+*** Install the SQLite GUI Tool
+#+cindex:GUI tool
+#+cindex:SQLite Studio
+In this tutorial, we would like to introduce you to a free GUI tool for
+managing SQLite databases named [[http://sqlitestudio.pl/][SQLite Studio]].  The SQLite studio is free,
+portable, intuitive, and cross-platform.  It also provides some of the most
+important features to work with SQLite databases such as importing, exporting
+data in various formats including CSV, XML, and JSON.
+
+You can download the SQLite studio at the homepage of SQLite, extract the file
+into a folder e.g., ~/usr/local/sqlite/gui/~ and run it.
+
+** The SQLite Sample Database
+- http://www.sqlitetutorial.net/sqlite-sample-database/
+
+*Summary*: in this tutorial, we first introduce you to an SQLite sample
+database.  Then, we will give you the links to download the sample database and
+its diagram.  At the end of the tutorial, we will show you how to connect to
+the sample database using the ~sqlite3~ tool.
+
+*** Introduction to chinook SQLite sample database
+#+cindex:@file{chinook.db}
+#+cindex:sample database, @file{chinook.db}
+We provide you with the SQLite sample database named =chinook=.  The =chinook=
+sample database is a good database for practicing with SQL, especially SQLite.
+
+The following database diagram illustrates the chinook database tables and
+their relationships.
+
+#+caption:The Chinook Database Tables and Relationships
+#+name:fig:chinook-db-tables
+[[file:figs/sqlite-sample-database-color.jpg]]
+
+{{{heading(The Tables)}}}
+
+#+cindex:@file{chinook.db} tables
+There are 11 tables in the chinook sample database.
+
+- =employees= ::
+
+                 #+cindex:employees
+                 stores employees data such as employee id, last name, first
+                 name, etc.  It also has a field named =ReportsTo= to specify
+                 who reports to whom.
+
+- =customers= ::
+
+                 #+cindex:customers
+                 stores customers data.
+
+- =invoices= & =invoice_items= ::
+
+     #+cindex:invoices
+     #+cindex:invoice_items
+     these two tables store invoice data.  The =invoices= table stores invoice
+     header data and the =invoice_items= table stores the invoice line items
+     data.
+
+- =artists= ::
+
+               #+cindex:artists
+               stores artists data.  It is a simple table that contains only
+               artist id and name.
+
+- =albums= ::
+
+              #+cindex:albums
+              stores data about a list of tracks.  Each album belongs to one
+              artist.  However, one artist may have multiple albums.
+
+- =media_types= ::
+
+                   #+cindex:media_types
+                   stores media types such as MPEG audio and AAC audio file.
+
+- =genres= ::
+
+              #+cindex:genres
+              stores music types such as rock, jazz, metal, etc.
+
+- =tracks= ::
+
+              #+cindex:tracks
+              store the data of songs.  Each track belongs to one album.
+
+- =playlists= & =playlist_track= ::
+
+     #+cindex:playlists
+     #+cindex:playlist_tracks
+     =playlists= table store data about playlists.  Each playlist contains a
+     list of tracks.  Each track may belong to multiple playlists.  The
+     relationship between the =playlists= table and =tracks= table is
+     many-to-many.  The =playlist_track= table is used to reflect this
+     relationship.
+
+*** Download the SQLite Sample Database
+#+cindex:@file{chinook.db} download
+#+cindex:download @file{chinook.db}
+You can download the SQLite sample database using the following link:
+
+- [[http://www.sqlitetutorial.net/wp-content/uploads/2018/03/chinook.zip][Download SQLite Sample Database]]
+
+*** Connect to SQLite Sample Database
+
+#+cindex:connect to sample database
+The name of the file is ~chinook.db~.
+
+- Navigate to the SQLite installation directory (~/usr/local/sqlite/~) where
+  the ~sqlite3.exe~ file is located.
+
+- Second, you use the following command to connect to the =chinook= sample
+  database located in the ~db/~ folder, which is a subfolder of the ~sqlite/~
+  folder:
+  : sqlite3 db/chinook.db
+  : sqlite>
+
+- Third, you can try a simple command e.g., ~.tables~ to view all the tables
+  available in the sample database:
+  : sqlite> .tables
+
+   #+begin_example
+   ? sqlite3 db/chinook.db
+   SQLite version 3.28.0 2019-04-16 19:49:53
+   Enter ".help" for usage hints.
+   sqlite> .tables
+   albums          employees       invoices        playlists
+   artists         genres          media_types     tracks
+   customers       invoice_items   playlist_track
+   sqlite>
+   #+end_example
+
+* Basic SQLite tutorial
+This section presents basic SQL statements that you can use with SQLite.  You
+will first start querying data from the [[http://www.sqlitetutorial.net/sqlite-sample-database/][sample database]].
+
+** Simple query
+
+** Sorting rows
+
+** Filtering data
+
+** Joining tables
+
+** Grouping data
+
+** Set operators
+
+** Subquery
+
+** More querying techniques
+
+** Changing data
+
+** Transactions
+
+** Data definition
+
+** Views
+
+** Indexes
+
+** Triggers
+
+** Full-text search
+
+** SQLite tools
+
+* SQLite Functions
+
+** SQLite Aggregate Functions
+
+** SQLite Date Functions
+
+** SQLite String Functions
+
+** SQLite Window Functions
+
+* SQLite Programming Interfaces
+
+** SQLite Java
+
+** SQLite Python
+
+** SQLite PHP
+
+** SQLite Node.js
+
+* SQLite Resources
+- http://www.sqlitetutorial.net/sqlite-resources/
+
+** SQLite useful links
+
+** SQLite interfaces
+
+** SQLite GUI tools
+
+* Command Line Shell For SQLite
+- https://www.sqlite.org/cli.html
+
+* SQLite Advanced Tutorials
+
+** SQLite Window Frame
+
+** SQLite =CUME_DIST=
+
+** SQLite =PERCENT_RANK=
+
+** SQLite =DENSE_RANK=
+
+** SQLite =NTILE=
+
+** SQLite =NTH_VALUE=
+
+** SQLite =LAST_VALUE=
+
+** SQLite =FIRST_VALUE=
+
+* List of Figures
+:PROPERTIES:
+:unnumbered: t
+:END:
+
+#+texinfo:@listoffloats Figure
+
+* Index
+:PROPERTIES:
+:unnumbered: t
+:index:    cp
+:END:
+* Export Options                                                   :noexport:
+** HTML Export Options
+#+options: html-link-use-abs-url:nil html-postamble:auto html-preamble:t
+#+options: html-scripts:t html-style:t html5-fancy:t tex:t date:nil
+#+html_doctype: html5
+#+html_container: div
+#+description:
+#+keywords:
+#+html_link_home:
+#+html_link_up:
+#+html_mathjax:
+#+html_head:
+#+html_head_extra:
+#+subtitle:
+#+infojs_opt:
+#+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 27.0.50 (<a href="https://orgmode.org">Org</a> mode 9.2.3)
+#+latex_header:
+
+** Texinfo Export Options
+#+texinfo_filename:SQLiteTutorial.info
+#+texinfo_class: info
+#+texinfo_header:
+#+texinfo_post_header:
+#+subtitle:
+#+subauthor:
+#+texinfo_dir_category: Databases
+#+texinfo_dir_title:SQLite Tutorial
+#+texinfo_dir_desc: Everything you need to know to start using SQLite effectively.
+#+texinfo_printed_title:SQLite Tutorial
+
+* Macro Definitions                                                :noexport:
+#+macro:heading @@texinfo:@heading @@@@html:<h2>@@ $1 @@html:</h2>@@
+#+macro:subheading @@texinfo:@subheading @@@@html:<h3>@@ $1 @@html:</h3>@@
+
+* Local Variables                                                  :noexport:
+# Local variables:
+# time-stamp-pattern:"8/^\\#\\+date:%:y-%02m-%02d %:H:%:M$"
+# End:
