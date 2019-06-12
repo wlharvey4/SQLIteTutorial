@@ -1,8 +1,8 @@
 # -*- mode:org; fill-column:79; -*-
 #+title:SQLite Tutorial
 #+subtitle:{{{version}}}
-#+date:2019-06-11 22:38
-#+macro:version Version 0.0.4 {{{date}}}
+#+date:2019-06-12 11:23
+#+macro:version Version 0.0.5 {{{date}}}
 * Introduction
 - [[https://www.sqlite.org/index.html][SQLite Home]]
 - [[https://www.sqlite.org/docs.html][SQLite Documentation]]
@@ -937,6 +937,8 @@ This section presents basic SQL statements that you can use with SQLite.  You
 will first start querying data from the [[http://www.sqlitetutorial.net/sqlite-sample-database/][sample database]].
 
 ** Simple query
+- http://www.sqlitetutorial.net/sqlite-select/
+
   #+cindex:SELECT statement
 - SQLite Select ::
 
@@ -1130,6 +1132,8 @@ So try to avoid using the asterisk (=*=) as a good habit when you use the
 =SELECT= statement.
 
 ** Sorting rows
+- http://www.sqlitetutorial.net/sqlite-order-by/
+
 - SQLite Order By ::
 
      sort the result set in ascending or descending order
@@ -1293,6 +1297,7 @@ list that appears in the =SELECT= clause.
 
 ** Filtering data
 *** SQLite Select Distinct
+- http://www.sqlitetutorial.net/sqlite-select-distinct
 
 - query unique rows from a table using the [[http://www.sqlitetutorial.net/sqlite-select-distinct][=DISTINCT=]] clause.
 
@@ -1388,8 +1393,8 @@ FROM
 
 The statement returns 11 rows with one =NULL= value.
 
-
 *** SQLite Where
+- http://www.sqlitetutorial.net/sqlite-where/
 
 - filter rows of a result set using various conditions
 
@@ -1535,26 +1540,671 @@ WHERE
 #+end_src
 
 *** SQLite Limit
+- http://www.sqlitetutorial.net/sqlite-limit/
 
 - constrain the number of rows that you want to return.  The =LIMIT= clause
   helps you get the necessary data returned by a query.
 
+
+*Summary*: in this tutorial, you will learn how to use SQLite =LIMIT= clause to
+constrain the number of rows returned by a query.
+
+**** Introduction to SQLite LIMIT clause
+#+cindex:@command{LIMIT} clause
+#+cindex:constrail number of rows, @command{LIMIT}
+The =LIMIT= clause is an optional part of the =SELECT= statement.  You use the
+=LIMIT= clause to constrain the number of rows returned by the query.
+
+For example, a =SELECT= statement returns one million rows.  However, if you
+just need the first 10 rows in the result set, you add the =LIMIT= clause to the
+=SELECT= statement to get exact 10 rows.
+
+The following illustrates the syntax of the =LIMIT= clause.
+
+#+begin_src sql
+SELECT
+ column_list
+FROM
+ table
+LIMIT row_count;
+#+end_src
+
+#+cindex:@code{row_count}
+The =row_count= is a positive integer that specifies the number of rows
+returned.
+
+For example, to get the first 10 rows in the =tracks= table, you use the
+following statement:
+
+#+begin_src sql
+SELECT
+ trackId,
+ name
+FROM
+ tracks
+LIMIT 10;
+#+end_src
+
+#+cindex:@command{OFFSET} keyword
+If you want to get the first 10 rows starting from the 10th row of the result
+set, you use =OFFSET= keyword as the following:
+
+#+begin_src sql
+SELECT
+ column_list
+FROM
+ table
+LIMIT row_count OFFSET offset;
+#+end_src
+
+#+cindex:@command{LIMIT OFFSET} clause shorthand syntax
+Or you can use the following shorthand syntax of the =LIMIT OFFSET= clause:
+
+#+begin_src sql
+SELECT
+ column_list
+FROM
+ table
+LIMIT offset, row_count;
+#+end_src
+
+For example, to get 10 rows starting from the 10th row in the =tracks= table, you
+use the following statement:
+
+#+begin_src sql
+SELECT
+ trackId,
+ name
+FROM
+ tracks
+LIMIT 10 OFFSET 10;
+#+end_src
+
+#+cindex:paginate result sets, @command{OFFSET}
+You often find the uses of =OFFSET= in web applications for paginating result
+sets.
+
+**** SQLite =LIMIT= and =ORDER BY= clause
+#+cindex:@command{LIMIT ORDER BY}
+We typically use the =LIMIT= clause with =ORDER BY= clause, because we are
+interested in getting the number of rows in a specified order, not in
+unspecified order.
+
+The =ORDER BY= clause appears before the =LIMIT= clause in the =SELECT=
+statement.  SQLite sorts the result set before getting the number of rows
+specified in the =LIMIT= clause.
+
+#+begin_src sql
+SELECT
+ column_list
+FROM
+ table
+ORDER BY
+ column_1
+LIMIT row_count;
+#+end_src
+
+For example, to get the top 10 largest tracks in bytes, you use the following
+query:
+
+#+begin_src sql
+SELECT
+ trackid,
+ name,
+ bytes
+FROM
+ tracks
+ORDER BY
+ bytes DESC
+LIMIT 10;
+#+end_src
+
+To get 5 shortest tracks, you sort the tracks by length specified by
+milliseconds column using =ORDER BY= clause and get first 5 rows using =LIMIT=
+clause.
+
+#+begin_src sql
+SELECT
+ trackid,
+ name,
+ milliseconds
+FROM
+ tracks
+ORDER BY
+ milliseconds ASC
+LIMIT 5;
+#+end_src
+
+**** Getting the n^th highest and lowest values
+#+cindex:nth highest, lowest
+You can use the =ORDER BY= and =LIMIT= clauses to get the n^th highest or lowest
+value row.  For example, you may want to know the second longest track, the
+third smallest track, etc.
+
+To do this, you use the following steps:
+
+1. First, use =ORDER BY= to sort the result set in ascending order in case you
+   want to get the n^th lowest value, or descending order if you want to get the
+   n^th highest value.
+
+2. Second, use the =LIMIT OFFSET= clause to get the n^th highest or the n^th
+   lowest row.
+
+
+The following statement returns the second longest track in the tracks table.
+
+#+begin_src sql
+SELECT
+ trackid,
+ name,
+ milliseconds
+FROM
+ tracks
+ORDER BY
+ milliseconds DESC
+LIMIT 1 OFFSET 1;
+#+end_src
+
+The following statement gets the third smallest track on the =tracks= table.
+
+#+begin_src sql
+SELECT
+ trackid,
+ name,
+ bytes
+FROM
+ tracks
+ORDER BY
+ bytes
+LIMIT 1 OFFSET 2;
+#+end_src
+
 *** SQLite BETWEEN
+- http://www.sqlitetutorial.net/sqlite-between/
 
 - test whether a value is in a range of values
 
-*** SQLite IN
 
-check if a value matches any value in a list of value or subquery
+*Summary*: in this tutorial, you will learn how to use the SQLite =BETWEEN=
+operator to test whether a value is in a range of values.
+
+**** Introduction to SQLite =BETWEEN= Operator
+#+cindex:@command{BETWEEN} operator
+#+cindex:range of values
+The =BETWEEN= operator is a logical operator that tests whether a value is in
+range of values.  If the value is in the specified range, the =BETWEEN=
+operator returns =true=.  The =BETWEEN= operator can be used in the =WHERE=
+clause of the =SELECT=, =DELETE=, =UPDATE=, and =REPLACE= statements.
+
+The following illustrates the syntax of the SQLite =BETWEEN= operator:
+: test_expression BETWEEN low_expression AND high_expression
+
+In this syntax:
+
+- =test_expression= is an expression to test for in the range defined by
+  =low_expression= and =high_expression=.
+
+- =low_expression= and =high_expression= is any valid expression that specify
+  the low and high values of the range.  The =low_expression= should be less
+  than or equal to =high_expression=, or the =BETWEEN= is always returns
+  =false=.
+
+  #+cindex:@command{AND} keyword
+- The =AND= keyword is a placeholder which indicates the =test_expression=
+  should be within the range specified by =low_expression= and
+  =high_expression=.
+
+
+Note that the BETWEEN operator is inclusive.  It returns =true= when the
+=test_expression= is less than or equal to =high_expression= and greater than
+or equal to the value of =low_expression=:
+: test_expression >= low_expression AND test_expression <= high_expression
+
+To specify an exclusive range, you use the greater than (=>=) and less than
+operators (=<=).
+
+Note that if any input to the =BETWEEN= operator is =NULL=, the result is
+=NULL=, or unknown to be precise.
+
+{{{heading(NOT BETWEEN Operator)}}}
+
+#+cindex:@command{NOT BETWEEN} operator
+To negate the result of the =BETWEEN= operator, you use the =NOT BETWEEN=
+operator as follows:
+: test_expression NOT BETWEEN low_expression AND high_expression
+
+The =NOT BETWEEN= returns =true= if the value of =test_expression= is less than
+the value of =low_expression= or greater than the value of =high_expression=:
+: test_expression < low_expression OR test_expression > high_expression
+
+**** SQLite =BETWEEN= operator examples
+
+We will use the =invoices= table from the sample database for the
+demonstration:
+
+[[file:figs/invoices.png][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/invoices.png]]
+
+***** SQLite =BETWEEN= numeric values example
+
+The following statement finds invoices whose total is =BETWEEN= 14.96 and
+18.86:
+
+#+begin_src sql
+SELECT
+    InvoiceId,
+    BillingAddress,
+    Total
+FROM
+    invoices
+WHERE
+    Total BETWEEN 14.91 and 18.86    
+ORDER BY
+    Total; 
+#+end_src
+
+Here is the output:
+
+[[file:figs/SQLite-BETWEEN-Numbers-example.png][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/SQLite-BETWEEN-Numbers-example.png]]
+
+***** SQLite =NOT BETWEEN= numeric values example
+
+To find the invoices whose total are not between 1 and 20, you use the =NOT
+BETWEEN= operator as shown in the following query:
+
+#+begin_src sql
+SELECT
+    InvoiceId,
+    BillingAddress,
+    Total
+FROM
+    invoices
+WHERE
+    Total NOT BETWEEN 1 and 20
+ORDER BY
+    Total;
+#+end_src
+
+***** SQLite =BETWEEN= dates example
+
+The following example finds invoices whose invoice dates are from January 1
+2010 and January 31 2010:
+
+#+begin_src sql
+SELECT
+    InvoiceId,
+    BillingAddress,
+    InvoiceDate,
+    Total
+FROM
+    invoices
+WHERE
+    InvoiceDate BETWEEN '2010-01-01' AND '2010-01-31'
+ORDER BY
+    InvoiceDate;
+#+end_src
+
+*** SQLite IN
+- http://www.sqlitetutorial.net/sqlite-in/
+
+- check if a value matches any value in a list of value or subquery
+
+
+#+cindex:@command{IN} operator
+#+cindex:match values
+*Summary*: in this tutorial, you will learn how to use the SQLite =IN= operator
+to determine whether a value matches any value in a list of values or a
+subquery.
+
+**** Introduction to the SQLite =IN= operator
+The SQLite =IN= operator is used to determine whether a value matches any value
+in a list or a subquery.  The syntax of the =IN= operator is as follows:
+
+: expression [NOT] IN (value_list|subquery);
+
+The =expression= can be any valid expression.  It can be a column of a table.
+
+A list of values is a fixed value list or a result set of one column returned
+by a subquery.  The returned type of the expression and values in the list must
+be the same.
+
+#+cindex:@command[NOT IN} operator
+The =IN= operator returns =true= or =false= depending on whether the expression
+matches any value in a list of values or not.  To negate the list of values, you
+use the =NOT IN= operator.
+
+**** SQLite =IN= operator examples
+
+We will use the =tracks= table in the sample database for the demonstration.
+
+[[file:figs/tracks.png][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/tracks.png]]
+
+The following statement uses the =IN= operator to query the tracks whose media
+type id is 1 or 2.
+
+#+begin_src sql
+SELECT
+ trackid,
+ name,
+ mediatypeid
+FROM
+ tracks
+WHERE
+ mediatypeid IN (1, 2)
+ORDER BY
+ name ASC;
+#+end_src
+
+[[file:figs/SQLite-IN-Operator.jpg][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/SQLite-IN-Operator.jpg]]
+
+
+#+cindex:@command[OR} operator
+You can achieve the same result using the =OR= operator.
+
+#+begin_src sql
+SELECT
+ trackid,
+ name,
+ MediaTypeId
+FROM
+ tracks
+WHERE
+ mediatypeid = 1 OR mediatypeid = 2
+ORDER BY
+ name ASC;
+#+end_src
+
+Using the =IN= operator is much shorter.  If you have a query that uses many
+=OR= operators in an expression, you can use the =IN= operator to replace the
+=OR= operators to make the query more readable.
+
+**** SQLite =IN= operator with a subquery example
+The following query returns a list of album id of the artist id 12:
+
+#+begin_src sql
+SELECT
+ albumid
+FROM
+ albums
+WHERE
+ artistid = 12;
+#+end_src
+
+To get the tracks that belong to the artist id 12, you can combine the =IN=
+operator with a subquery as follows:
+
+#+begin_src sql
+SELECT
+ trackid,
+ name,
+ albumid
+FROM
+ tracks
+WHERE
+ albumid IN (
+ SELECT
+ albumid
+ FROM
+ albums
+ WHERE
+ artistid = 12
+ );
+#+end_src
+
+[[file:figs/SQLite-IN-subquery-example.jpg][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/SQLite-IN-subquery-example.jpg]]
 
 *** SQLite Like
+- http://www.sqlitetutorial.net/sqlite-like/
 
-query data based on pattern matching using wildcard characters: percent sign
-(=%=) and underscore (=_=)
+- query data based on pattern matching using wildcard characters: percent sign
+  (=%=) and underscore (=_=)
+
+
+*Summary*: in this tutorial, you will learn how to query data based on pattern
+matching using SQLite LIKE operator.
+
+**** Introduction to SQLite =LIKE= operator
+
+Sometimes, you don’t know exactly the complete keyword that you want to
+query.  For example, you may know that your most favorite song contains the
+word, "elevator" but you don’t know exactly the name.
+
+#+cindex:@command{LIKE} operator
+To query data based on partial information, you use the SQLite =LIKE= operator
+in the =WHERE= clause of the =SELECT= statement as follows:
+
+#+begin_src sql
+SELECT
+ column_list
+FROM
+ table_name
+WHERE
+ column_1 LIKE pattern;
+#+end_src
+
+Note that you can also use the =LIKE= operator in the =WHERE= clause of other
+statements such as =DELETE= and =UPDATE=.
+
+There are two ways to construct a pattern: using percent sign =%= and
+underscore =_= wildcards:
+
+1. The percent sign =%= wildcard matches any sequence of zero or more
+   characters.
+
+2. The underscore =_= wildcard matches any single character.
+
+**** The percent sign =%= wildcard examples
+The percent sign =s%= matches any string that starts with =s=, e.g., =son=,
+=so=, etc.  The =%er= pattern matches any string that ends with er e.g.,
+=peter=, =clever=, etc.  And the =%per%= pattern matches any string that
+contains =per= such as =percent=, =peeper=, etc.
+
+**** The underscore =_= wildcard examples
+The =h_nt= pattern matches =hunt=, =hint=, etc.  The =__pple= pattern matches
+=topple=, =supple=, =tipple=, etc.
+
+
+#+cindex:case sensitive, insensitive
+#+cindex:Unicode
+#+cindex:ASCII
+#+cindex:@command{PRAGMA}, case sensitive
+Note that SQLite =LIKE= operator is case-insensitive.  It means ="A" LIKE "a"=
+is =true=.  However, for Unicode characters that are not in the ASCII range,
+SQLite =LIKE= operator is case sensitive e.g., ="Ä" LIKE "ä"= is =false=.  In
+case you want to make =LIKE= case sensitive, you use the following =PRAGMA=:
+
+: PRAGMA case_sensitive_like = true;
+
+**** SQLite =LIKE= and escape character
+#+cindex:escape character
+#+cindex:@command{ESCAPE} clause
+If the pattern that you want to match contains =%= or =_=, you must use an
+escape character in an optional =ESCAPE= clause as follows:
+
+: column_1 LIKE pattern ESCAPE "escape_character";
+
+For example, you want to find =get_value= in the table, you put the =_= as the
+escape character like the following expression:
+
+: column_1 LIKE '%get_value%' ESCAPE '_';
+
+**** SQLite LIKE examples
+
+We use the =tracks= table in the sample database for the purpose of
+demonstration.
+
+[[file:figs/tracks.png][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/tracks.png]]
+
+To find the tracks whose names start with the =Wild= literal string, you use the
+percent sign =%= wildcard at the end of the pattern.
+
+#+begin_src sql
+SELECT
+ trackid,
+ name 
+FROM
+ tracks
+WHERE
+ name LIKE 'Wild%'
+#+end_src
+
+[[file:figs/SQLite-LIKE-percentage-wildcard.png][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/SQLite-LIKE-percentage-wildcard.png]]
+
+To find the tracks whose names end with =Wild= word, you use =%= wildcard at
+the beginning of the pattern.
+
+#+begin_src sql
+SELECT
+ trackid,
+ name
+FROM
+ tracks
+WHERE
+ name LIKE '%Wild'
+#+end_src
+
+[[file:figs/SQLite-LIKE-example.png][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/SQLite-LIKE-example.png]]
+
+To find the tracks whose names contain the =Wild= literal string, you use =%=
+wildcard at the beginning and end of the pattern:
+
+#+begin_src sql
+SELECT
+ trackid,
+ name 
+FROM
+ tracks
+WHERE
+ name LIKE '%Wild%';
+#+end_src
+
+[[file:figs/SQLite-LIKE-wildcard-example.png][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/SQLite-LIKE-wildcard-example.png]]
+
+The following statement finds the tracks whose names contain: zero or more
+characters (=%=), followed by =Br=, followed by a character (=_=), followed by
+=wn=, and followed by zero or more characters (=%=):
+
+#+begin_src sql
+SELECT
+ trackid,
+ name
+FROM
+ tracks
+WHERE
+ name LIKE '%Br_wn%';
+#+end_src
 
 *** SQLite Glob
+- http://www.sqlitetutorial.net/sqlite-glob/
 
-determine whether a string matches a specific UNIX-pattern
+- determine whether a string matches a specific UNIX-pattern
+
+
+*Summary*: in this tutorial, you will learn how to use the SQLite GLOB operator
+to determine whether a string matches a specific pattern.
+
+**** Introduction to the SQLite =GLOB= operator
+The =GLOB= operator is similar to the LIKE operator.  The =GLOB= operator
+determines whether a string matches a specific pattern.
+
+Unlike the =LIKE= operator, the =GLOB= operator is case sensitive and uses the
+=UNIX= wildcards.  In addition, the =GLOB= patterns do not have escape
+character.
+
+The following shows the =GLOB= wildcards:
+
+- the asterisk (=*=) wildcard matches any number of characters.
+
+- the question mark (=?=) wildcard matches exactly one character.
+
+
+In addition, you can use the list wildcard =[]= to match one character from a
+list of characters.  For example =[xyz]= match any single x, y, or z character.
+
+The list wildcard also allows a range of characters e.g., =[a-z]= matches any
+single lowercase character from a to z. The =[a-zA-Z0-9]= pattern matches any
+single alphanumeric character, both lowercase and uppercase.
+
+You use the =^= at the beginning of the list to match any character except any
+character in the list.  For example, the =[^0-9]= pattern matches any single
+character except a numeric character.
+
+**** SQLite GLOB examples
+The following statement finds tracks whose names start with the string =Man=.  The
+pattern =Man*= matches any string that starts with =Man=.
+
+#+begin_src sql
+ trackid,
+ name
+FROM
+ tracks
+WHERE
+ name GLOB 'Man*';
+#+end_src
+
+The following statement gets the tracks whose names end with =Man=.  The
+pattern =*Man= matches any string that ends with =Man=.
+
+#+begin_src sql
+SELECT
+ trackid,
+ name
+FROM
+ tracks
+WHERE
+ name GLOB '*Man';
+#+end_src
+
+The following query finds the tracks whose names start with any single
+character (=?=), followed by the string ere and then any number of character
+(=*=).
+
+#+begin_src sql
+SELECT
+ trackid,
+ name
+FROM
+ tracks
+WHERE
+ name GLOB '?ere*';
+#+end_src
+
+To find the tracks whose names contain numbers, you can use the list wildcard
+=[0-9]= as follows:
+
+#+begin_src sql
+SELECT
+ trackid,
+ name
+FROM
+ tracks
+WHERE
+ name GLOB '*[1-9]*';
+#+end_src
+
+Or to find the tracks whose name does not contain any number, you place the =^=
+at the beginning of the list:
+
+#+begin_src sql
+SELECT
+ trackid,
+ name
+FROM
+ tracks
+WHERE
+ name GLOB '*[^1-9]*';
+#+end_src
+
+The following statement finds the tracks whose names end with a number.
+
+#+begin_src sql
+SELECT
+ trackid,
+ name
+FROM
+ tracks
+WHERE
+ name GLOB '*[1-9]';
+#+end_src
 
 ** Joining tables
 - SQLite Inner Join ::
