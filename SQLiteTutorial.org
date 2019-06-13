@@ -1,8 +1,8 @@
 # -*- mode:org; fill-column:79; -*-
 #+title:SQLite Tutorial
 #+subtitle:{{{version}}}
-#+date:2019-06-12 11:23
-#+macro:version Version 0.0.5 {{{date}}}
+#+date:2019-06-12 23:29
+#+macro:version Version 0.0.6 {{{date}}}
 * Introduction
 - [[https://www.sqlite.org/index.html][SQLite Home]]
 - [[https://www.sqlite.org/docs.html][SQLite Documentation]]
@@ -2231,15 +2231,144 @@ WHERE
      and union clauses.
 
 ** Grouping data
+
+*** SQLite =GROUP BY= Clause
+- http://www.sqlitetutorial.net/sqlite-group-by/
+
 - SQLite Group By ::
 
      combine a set of rows into groups based on specified criteria. The GROUP
      BY clause helps you summarize data for reporting purposes.
 
+
+*Summary*: in this tutorial, you will learn how to use SQLite GROUP BY clause
+to make a set of summary rows from a set of rows.
+
+**** Introduction to SQLite GROUP BY clause
+#+cindex:@command{GROUP BY} clause
+#+cindex:summary rows, @command{GROUP BY}
+The =GROUP BY= clause is an optional clause of the =SELECT= statement.  The
+=GROUP BY= clause a selected group of rows into summary rows by values of one
+or more columns.
+
+The =GROUP BY= clause returns one row for each group.  For each group, you can
+apply an aggregate function such as =MIN=, =MAX=, =SUM=, =COUNT=, or =AVG= to
+provide more information about each group.
+
+The following statement illustrates the syntax of the SQLite GROUP BY clause.
+
+#+begin_src sql
+SELECT
+    column_1,
+    aggregate_function(column_2)
+FROM
+    table
+GROUP BY
+    column_1,
+    column_2;
+#+end_src
+
+The =GROUP BY= clause comes after the =FROM= clause of the =SELECT= statement.
+In case a statement contains a =WHERE= clause, the =GROUP BY= clause must come
+after the =WHERE= clause.
+
+Following the =GROUP BY= clause is a column or a list of comma-separated
+columns used to specify the group.
+
+**** SQLite =GROUP BY= examples
+
+**** SQLite =HAVING=
+- http://www.sqlitetutorial.net/sqlite-having/
+
 - SQLite Having ::
 
                    specify the conditions to filter the groups summarized by
                    the =GROUP BY= clause.
+
+
+
+*Summary*: in this tutorial, you will learn how to use SQLite HAVING clause to
+specify a filter condition for a group or an aggregate.
+
+**** Introduction to SQLite =HAVING= clause
+#+cindex:@command{HAVING} clause
+#+cindex:search condition, @command{HAVING}
+SQLite =HAVING= clause is an optional clause of the =SELECT= statement.  The
+=HAVING= clause specifies a search condition for a group.
+
+You often use the =HAVING= clause with the =GROUP BY= clause.  The =GROUP BY=
+clause groups a set of rows into a set of summary rows or groups.  Then the
+=HAVING= clause filters groups based on specified conditions.
+
+If you use a =HAVING= clause without the =GROUP BY= clause, the =HAVING= clause
+behaves like a =WHERE= clause.  Note that the =HAVING= clause is applied after
+=GROUP BY= clause, while the =WHERE= clause is applied before.
+
+The following illustrates the syntax of the =HAVING= clause:
+
+#+begin_src sql
+SELECT
+ column_1,
+ aggregate_function (column_2)
+FROM
+ table
+GROUP BY
+ column_1
+HAVING
+ search_condition;
+#+end_src
+
+SQLite evaluates the =search_condition= for each group as a Boolean expression.
+It only includes a group in the final result set if the evaluation is =true=.
+
+**** SQLite =HAVING= clause examples
+We will use the =tracks= table in the sample database for demonstration.
+
+To find the number of tracks for each album, you use =GROUP BY= clause as
+follows:
+
+#+begin_src sql
+SELECT
+ albumid,
+ COUNT(trackid)
+FROM
+ tracks
+GROUP BY
+ albumid;
+#+end_src
+
+To find the numbers of tracks for the album with id 1, we add a =HAVING= clause
+to the following statement:
+
+#+begin_src sql
+SELECT
+ albumid,
+ COUNT(trackid)
+FROM
+ tracks
+GROUP BY
+ albumid
+HAVING albumid = 1;
+#+end_src
+
+We have referred to the =AlbumId= column in the =HAVING= clause.
+
+To find albums that have the number of tracks between 18 and 20, we refer to
+the aggregate function in the =HAVING= clause as the following statement:
+
+#+begin_src sql
+SELECT
+ albumid,
+ COUNT(trackid)
+FROM
+ tracks
+GROUP BY
+ albumid
+HAVING count(albumid) BETWEEN 18 AND 20
+ORDER BY albumid;
+#+end_src
+
+**** SQLite =HAVING= clause with =INNER JOIN= example
 
 ** Set operators
 - SQLite Union ::
@@ -2277,87 +2406,1207 @@ WHERE
 This section guides you how to update data in the table using insert, update,
 and delete statements.
 
+*** SQLite =INSERT=---inserting a single row into a table
+- http://www.sqlitetutorial.net/sqlite-insert/
+
 - SQLite Insert ::
 
                    insert rows into a table
+
+
+*Summary*: in this tutorial, you will learn how to use SQLite =INSERT=
+statement to insert new rows into a table.
+
+To insert data into a table, you use the =INSERT= statement.  SQLite provides
+various forms of the =INSERT= statements that allow you to insert a single row,
+multiple rows, and default values into a table.
+
+In addition, you can insert a row into a table using data provided by a
+=SELECT= statement.
+
+**** SQLite INSERT --- inserting a single row into a table
+#+cindex:@command{INSERT} statement
+To insert a single row into a table, you use the following form of the =INSERT=
+statement:
+
+#+begin_src sql
+INSERT INTO table1 (
+ column1,
+ column2 ,..)
+VALUES
+ (
+ value1,
+ value2 ,...);
+#+end_src
+
+Let’s examine the =INSERT= statement in more detail:
+
+- First, specify a table to which you want to insert data after the =INSERT
+  INTO= clause.
+
+- Second, add a comma-separated list of columns.  This list is optional.
+
+- Third, add a comma-separated list of values after the =VALUES= clause.  If
+  you omit the column list, you have to specify values for all columns in the
+  value list.  The number of values must be the same as the number of columns.
+
+
+We will take the =artists= table in the sample database for the demonstration.
+
+For example, to insert a new row into the =artists= table, you use the
+following statement.
+
+#+begin_src sql
+INSERT INTO artists (name)
+VALUES
+ ('Bud Powell');
+#+end_src
+
+Because the =artistid= column is an auto-increment column, you can ignore it in
+the statement.  SQLite takes the next number to insert into the =artistid=
+column.
+
+You can verify the insert operation using the following =SELECT= statement:
+
+#+begin_src sql
+SELECT
+ artistid,
+ name
+FROM
+ artists
+ORDER BY
+ artistid DESC
+LIMIT 1;
+#+end_src
+
+As you see, we have a new row in the =artists= table.
+
+**** SQLite =INSERT= --- Inserting multiple rows into a table
+To insert multiple rows into a table, you use the following form of the
+=INSERT= statement:
+
+#+begin_src sql
+INSERT INTO table1 (
+ column1,
+ column2 ,..)
+VALUES
+ (
+ value1,
+ value2 ,...),
+ (
+ value1,
+ value2 ,...),
+        ...
+ (
+ value1,
+ value2 ,...);
+#+end_src
+
+Each values list following the =VALUES= clause is a row that you want to insert
+into the table.  For example, to insert three new rows into the artists table,
+you use the following statement:
+
+#+begin_src sql
+INSERT INTO artists (name)
+VALUES
+ ("Buddy Rich"),
+ ("Candido"),
+ ("Charlie Byrd");
+#+end_src
+
+SQLite issued a message: =Row Affected: 3=
+
+You can verify the result using the following statement:
+
+#+begin_src sql
+SELECT
+ artistid,
+ name
+FROM
+ artists
+ORDER BY
+ artistid DESC
+LIMIT 3;
+#+end_src
+
+**** SQLite =INSERT= --- Inserting default values
+When you created a new table using =CREATE TABLE= statement, you defined
+default values for columns, or a =NULL= value if a default value is not
+specified.
+
+#+cindex:@command{INSERT DEFAULT VALUES} statement
+The third form of the =INSERT= statement is =INSERT DEFAULT VALUES=.  It
+inserts a new row into a table using the default values or =NULL= values of the
+column.
+
+For example, to insert a new row into the artists table using =INSERT DEFAULT
+VALUES=, you use the following statement:
+
+: INSERT INTO artists DEFAULT VALUES;
+
+To verify the insert, you use the following statement:
+
+#+begin_src sql
+SELECT
+ artistid,
+ name
+FROM
+ artists
+ORDER BY
+ artistid DESC;
+#+end_src
+
+The default value of the =artistid= column is the next integer in the sequence.
+
+However, the =name= column does not have any default value, the =INSERT DEFAULT
+VALUES= statement inserts a =NULL= value into the =name= column.
+
+**** SQLite =INSERT= --- Inserting new rows with data provided by a =SELECT= statement
+Suppose you want to backup the =artists= table, you create a new table named
+=artists_backup= as follows:
+
+#+begin_src sql
+CREATE TABLE artists_backup(
+ artistid INTEGER PRIMARY KEY AUTOINCREMENT,
+ name NVARCHAR
+);
+#+end_src
+
+To insert data into the =artists_backup= table with the data from the =artists=
+table, you use the =INSERT INTO SELECT= statement as follows:
+
+#+begin_src sql
+INSERT INTO artists_backup SELECT
+ artistid,
+ name
+FROM
+ artists;
+#+end_src
+
+If you query data from the =artists_backup= table, you will see all data in the
+=artists= table.
+
+#+begin_src sql
+SELECT
+ *
+FROM
+ artists_backup;
+#+end_src
+
+*** SQLite =UPDATE=
+- http://www.sqlitetutorial.net/sqlite-update/
 
 - SQLite Update ::
 
       update existing rows in a table.
 
+
+*Summary*: in this tutorial, you will learn how to use SQLite =UPDATE=
+statement to update data of existing rows in the table.
+
+**** Introduction to SQLite =UPDATE= statement
+#+cindex:@command{UPDATE} statement
+To update existing data in a table, you use SQLite =UPDATE= statement.  The
+following illustrates the syntax of the =UPDATE= statement:
+
+#+begin_src sql
+UPDATE table
+SET column_1 = new_value_1,
+    column_2 = new_value_2
+WHERE
+    search_condition 
+ORDER column_or_expression
+LIMIT row_count OFFSET offset;
+#+end_src
+
+First, you specify the table where you want to update after the =UPDATE=
+clause.
+
+Second, the =SET= clause allows you to update data in one or more columns
+determined by a list of comma-separated assignments.  Each assignment specifies
+a column name on the left side the assignment operator (=) and a literal value,
+an expression, or data from a subquery on the right side of the assignment
+operator.
+
+Third, the =WHERE= clause specifies the rows that you want to update.  The
+=WHERE= clause is an optional clause.  If you omit the =WHERE= clause, the
+=UPDATE= statement updates data in all rows of the table.
+
+Fourth, SQLite allows you to use the =ORDER BY= and =LIMIT= clauses in the
+=UPDATE= statement.  The =LIMIT= clause specifies the number of rows to be
+updated.
+
+Notice that if use a negative value in the =LIMIT= clause, SQLite assumes that
+there are no limit and updates all rows that meet the condition in the
+preceding =WHERE= clause.
+
+The =ORDER BY= clause goes with the =LIMIT= clause to control exactly which
+rows to update.  Otherwise, you will never know which row will actually be
+updated.  Because without the =ORDER BY= clause, the order of the result set is
+unspecified.
+
+**** SQLite =UPDATE= statement examples
+We will use the =employees= table in the sample database for the demonstration
+of the =UPDATE= statement.
+
+The following =SELECT= statement gets partial data from the =employees= table:
+
+#+begin_src sql
+SELECT
+ employeeid,
+ firstname,
+ lastname,
+ title,
+ email
+FROM
+ employees;
+#+end_src
+
+***** Update one column example
+Suppose, Jane got married and she wanted to change her last name to her
+husband’s last name i.e., Smith.  In this case, you can update Jane’s last name
+using the following statement:
+
+#+begin_src sql
+UPDATE employees
+SET lastname = 'Smith'
+WHERE
+ employeeid = 3;
+#+end_src
+
+The expression in the =WHERE= clause makes sure that we update Jane’s record
+only.  We set the =lastname= column to a literal string =Smith=.
+
+To verify the =UPDATE=, you use the following statement:
+
+#+begin_src sql
+SELECT
+ employeeid,
+ firstname,
+ lastname,
+ title,
+ email
+FROM
+ employees
+WHERE
+ employeeid = 3;
+#+end_src
+
+***** Update multiple columns example
+Suppose Park Margaret locates in Toronto and you want to change his address,
+city, and state information.  You can use the =UPDATE= statement to update
+multiple columns as follows:
+
+#+begin_src sql
+UPDATE employees
+SET city = 'Toronto',
+    state = 'ON',
+    postalcode = 'M5P 2N7'
+WHERE
+    employeeid = 4;
+#+end_src
+
+To verify the =UPDATE=, you use the following statement:
+
+#+begin_src sql
+SELECT
+ employeeid,
+ firstname,
+ lastname,
+ state,
+ city,
+ PostalCode
+FROM
+ employees
+WHERE
+ employeeid = 4;
+#+end_src
+
+***** Update with =ORDER BY= and =LIMIT= clauses example
+Note that you need to build SQLite with =SQLITE_ENABLE_UPDATE_DELETE_LIMIT=
+option in order to perform =UPDATE= statement with optional =ORDER BY= and
+=LIMIT= clauses.
+
+Let’s check the email addresses of employees in the employees table:
+
+#+begin_src sql
+SELECT
+ employeeid,
+ firstname,
+ lastname,
+ email
+FROM
+ employees;
+#+end_src
+
+To update one row in the employees table, you use =LIMIT 1= clause.  To make
+sure that you update the first row of employees sorted by the first name, you
+add the =ORDER BY firstname= clause.
+
+So the following statement updates email of Andrew Adams:
+
+#+begin_src sql
+UPDATE employees
+SET email = lower(
+ firstname || "." || lastname || "@chinookcorp.com"
+)
+ORDER BY
+ firstname
+LIMIT 1;
+#+end_src
+
+The new email is the combination of the first name, dot (=.=), last name and the
+suffix =@chinookcorp.com=
+
+The =LOWER= function converts the email to lower case.
+
+***** Update all rows example
+To update all rows in the =employees= table, you skip the =WHERE= clause.  For
+example, to standardize the email addresses of all employees, you use the
+following statement:
+
+#+begin_src sql
+UPDATE employees
+SET email = lower(
+ firstname || "." || lastname || "@chinookcorp.com"
+);
+#+end_src
+
+*** SQLite =DELETE=
+- http://www.sqlitetutorial.net/sqlite-delete/
+
 - SQLite Delete ::
 
                    delete rows from a table.
+
+
+*Summary*: this tutorial shows you how to use SQLite DELETE statement to remove
+rows from a table.
+
+**** Introduction to SQLite =DELETE= statement
+#+cindex:@command{DELETE} statement
+You have learned how to insert a new row into a table and update existing data
+of a table.  Sometimes, you need to remove rows from a table.  In this case, you
+use SQLite =DELETE= statement.
+
+The SQLite =DELETE= statement allows you to delete one row, multiple rows, and
+all rows in a table.  The syntax of the SQLite =DELETE= statement is as
+follows:
+
+#+begin_src sql
+DELETE
+FROM
+ table
+WHERE
+ search_condition;
+#+end_src
+
+In this syntax:
+
+- First, specify the table where you want to remove rows after the =DELETE FROM=
+  clause.
+
+- Second, add a search condition in the =WHERE= clause to identify which row to
+  remove.  The =WHERE= clause is an optional part of the =DELETE= statement.
+  If you omit the =WHERE= clause, all rows in the table will be removed.
+
+
+SQLite also provides an extension to the =DELETE= statement by adding =ORDER
+BY= and =LIMIT= clauses.  If you compile SQLite with the
+=SQLITE_ENABLE_UPDATE_DELETE_LIMIT= compile-time option, you can use the =ORDER
+BY= and =LIMIT= clause in the =DELETE= statement like the following form:
+
+#+begin_src sql
+DELETE
+FROM 
+   table
+WHERE search_condition
+ORDER BY criteria
+LIMIT row_count OFFSET offset;
+#+end_src
+
+The =ORDER BY= clause sorts the rows filtered by the preceding
+=search_condition= in the =WHERE= clause and the =LIMIT= clause specifies the
+number of rows that will be deleted.
+
+#+cindex:truncate optimization
+Notice that when you use the =DELETE= statement without a =WHERE= clause on a
+table that has no triggers, SQLite will delete all rows in one shot instead of
+visiting and deleting each row.  This feature is known as =truncate
+optimization=.
+
+**** SQLite =DELETE= statement examples
+We will use the =artists_backup= table that we created in the how to insert
+rows into table tutorial.
+
+#+begin_src sql
+SELECT
+ artistid,
+ name
+FROM
+ artists_backup;
+#+end_src
+
+We have 280 rows in the =artists_backup= table.
+
+To remove an artist with =id 1=, you use the following statement:
+
+#+begin_src sql
+DELETE
+FROM
+ artists_backup
+WHERE
+ artistid = 1;
+#+end_src
+
+Because we use =artistid= to identify the artist, the statement removed exactly
+1 row.
+
+Suppose we want to remove artists whose names contain the literal string
+=Santana=:
+
+#+begin_src sql
+DELETE
+FROM
+ artists_backup
+WHERE
+ name LIKE '%Santana%';
+#+end_src
+
+There are 9 rows whose values in the name column contain the =Santana= literal
+string; therefore, these 9 rows were removed.
+
+To remove all rows in the =artists_backup= table, you just need to omit the
+=WHERE= clause as the following statement:
+
+#+begin_src sql
+DELETE
+FROM
+ artists_backup;
+#+end_src
+
+*** SQLite =REPLACE=
+- http://www.sqlitetutorial.net/sqlite-replace-function/
 
 - SQLite Replace ::
 
                     insert a new row or replace the existing row in a table.
 
+
+#+cindex:@command{REPLACE()} function
+*Summary*: in this tutorial, you will learn how to use SQLite ~REPLACE()~
+function to replace all occurrences of a specified string with another string.
+
+**** Introduction to SQLite ~REPLACE()~ function
+The SQLite ~REPLACE()~ function is a string function that allows you to replace
+all occurrences of a specified string with another string.
+
+The following shows the syntax of the ~REPLACE()~ function:
+
+: REPLACE(string,pattern,replacement)
+
+In this syntax:
+
+- =string= is the string that you want to perform the replacement.
+
+- =pattern= is the substring to be found in the original string
+
+- =replacement= is the replacement string.
+
+
+The ~REPLACE()~ function is useful for updating character data in a table e.g.,
+update the dead links and typos.
+
+**** SQLite ~REPLACE()~ function examples
+Let’s take some examples of using the ~REPLACE()~ function.
+
+***** SQLite ~REPLACE()~ function simple example
+The following example replaces the string 'A' in the string 'AA B CC AAA' with
+the new string 'Z':
+
+#+begin_src sql
+SELECT
+    REPLACE('AA B CC AAA','A','Z');
+#+end_src
+
+The following statement uses the ~REPLACE()~ function to replace the string
+'This' in the string 'This is a cat' with the new string 'That':
+
+#+begin_src sql
+SELECT
+    REPLACE('This is a cat','This','That');
+#+end_src
+
+***** SQLite ~REPLACE()~ string in a table example
+First, create a new table named =contacts= that consists of four columns:
+=contact_id=, =first_name=, =last_name=, and =phone=:
+
+#+begin_src sql
+CREATE TABLE contacts (
+    contact_id INT PRIMARY KEY,
+    first_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
+    phone TEXT NOT NULL
+);
+#+end_src
+
+Next, insert into the =contacts= table some rows:
+
+#+begin_src sql
+INSERT INTO contacts(first_name, last_name, phone)
+VALUES('John','Doe','410-555-0168');
+INSERT INTO contacts(first_name, last_name, phone)
+VALUES('Lily','Bush','410-444-9862');
+#+end_src
+
+Then, query data from the =contacts= table:
+
+#+begin_src sql
+SELECT 
+    first_name, 
+    last_name,
+    phone
+FROM 
+    contacts;
+#+end_src
+
+After that, update the phone area code from local (410) to international
+one(+1-410):
+
+#+begin_src sql
+UPDATE
+    contacts
+SET
+    phone = REPLACE(phone,'410','+1-410');
+#+end_src
+
+Finally, query data from the contacts table to verify if the phone has been
+updated:
+
+#+begin_src sql
+SELECT 
+    first_name, 
+    last_name,
+    phone
+FROM 
+    contacts;
+#+end_src
+
 ** Transactions
+- http://www.sqlitetutorial.net/sqlite-transaction/
 
 - SQLite Transaction ::
 
      show you how to handle transactions.
 
-** Data definition
+
+*Summary*: in this tutorial, we will show you how to use the SQLite transaction
+to ensure the integrity and reliability of the data.
+
+*** SQlite & ACID
+#+cindex:ACID
+#+cindex:transactional database
+SQlite is a transactional database, ensuring that all /changes/ and /queries/
+are (ACID):
+- atomic,
+- consistent,
+- isolated, and
+- durable
+
+
+#+cindex:transactions
+SQLite guarantees all the transactions are ACID compliant even if the
+transaction is interrupted by program crash, operation system dump, or power
+failure to the computer.
+
+
+- Atomic :: a transaction should be atomic. It means that a change cannot be
+            broken down into smaller ones. When you commit a transaction,
+            either the entire transaction is applied or not applied. It cannot
+            be only part of the transaction to be applied.
+
+- Consistent :: a transaction must ensure to change the database from one valid
+                state to another. When a transaction starts and executes
+                statements to modify data, the database becomes
+                inconsistent. However, when the transaction is committed or
+                rolled back, it is important that the transaction must keep the
+                database consistent.
+
+- Isolation :: a pending transaction must be isolated from other clients. When
+               a client starts a transaction and executes the INSERT or UPDATE
+               statement to change the data, those changes are only visible to
+               the client, not other clients. On the other hand, the changes
+               committed by other clients after the transaction started should
+               not be visible to this client.
+
+- Durable :: if a transaction is successfully committed, the changes must be
+             permanent in the database regardless of the condition such as
+             power failure or program crash. On the contrary, if the program
+             crashes before the transaction is committed, the change should not
+             be present.
+
+
+**** SQLite transaction statements
+#+cindex:auto-commit mode
+By default, SQLite is in auto-commit mode.  It means that for each command,
+SQLite starts, processes, and commits the transaction automatically.
+
+#+cindex:transaction, start
+To start a transaction explicitly, you use the following steps:
+
+#+cindex:@command{BEGIN TRANSACTION} command
+First, open a transaction by issuing the =BEGIN TRANSACTION= command.
+
+: BEGIN TRANSACTION;
+
+#+cindex:transaction, open
+#+cindex:open transaction
+After executing the =BEGIN TRANSACTION= statement, the transaction is open until
+it is explicitly committed or rolled back.
+
+Second, issue the SQL commands to select or update data in the database.  Note
+that the change is only visible to the client.
+
+#+cindex:@command{COMMIT} statement
+#+cindex:@command{COMMIT TRANSACTION} statement
+Third, to commit the changes to the database, you use the =COMMIT= or =COMMIT
+TRANSACTION= statement.
+
+: COMMIT;
+
+#+cindex:@command{ROLLBACK} statement
+For any reason, if you do not want to commit the transaction, you can roll it
+back using the =ROLLBACK= or =ROLLBACK TRANSACTION= statement.
+
+: ROLLBACK;
+
+**** SQLite transaction example
+We will create two new tables: =accounts= and =account_changes= for the
+demonstration.
+
+The =accounts table stores data about the account numbers and their balances.
+The =account_changes= table stores changes of the accounts.
+
+First, the following =CREATE TABLE= statements create the new tables.
+
+#+begin_src sql
+CREATE TABLE IF NOT EXISTS accounts (
+    account_no INTEGER PRIMARY KEY
+                       NOT NULL,
+    balance    DECIMAL NOT NULL
+                       DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS account_changes(
+    account_no integer not null,
+    flag text not null,
+    amount decimal not null,
+    changed_at text not null
+);
+#+end_src
+
+Second, insert some sample data into the =accounts= table.
+
+#+begin_src sql
+INSERT INTO accounts (
+                         account_no,
+                         balance
+                     )
+                     VALUES (
+                         100,
+                         20100
+                     );
+
+INSERT INTO accounts (
+                         account_no,
+                         balance
+                     )
+                     VALUES (
+                         200,
+                         10100
+                     );
+#+end_src
+
+#+begin_src sql
+SELECT *
+  FROM accounts;
+#+end_src
+
+Third, transfer 1000 from the account 100 to the account 200, and write the
+changes to the =account_changes= table; perform all of the activities within the
+same transaction.
+
+#+begin_src sql
+BEGIN TRANSACTION;
+
+UPDATE accounts
+   SET balance = balance - 1000
+ WHERE account_no = 100;
+
+UPDATE accounts
+   SET balance = balance + 1000
+ WHERE account_no = 200;
+
+INSERT INTO account_changes(account_no,flag,amount,changed_at)
+values(100,'-',1000,datetime('now'));
+
+INSERT INTO account_changes(account_no,flag,amount,changed_at)
+values(200,'+',1000,datetime('now'));
+
+COMMIT;
+#+end_src
+
+** Data Definition
 In this section, we show you how to create database objects such as tables,
 views, indexes using SQL data definition language.
+
+*** SQLite Data Types
+- http://www.sqlitetutorial.net/sqlite-data-types/
 
 - SQLite Data Types ::
 
      introduce you to the SQLite dynamic types system and its important
      concepts: storage classes, manifest typing, and type affinity.
 
+
+*** SQLite =CREATE TABLE=
+- http://www.sqlitetutorial.net/sqlite-create-table/
+
 - SQLite Create Table ::
 
      show you how to create a new table in the database.
+
+
+*** SQLite =PRIMARY KEY=
+- http://www.sqlitetutorial.net/sqlite-primary-key/
 
 - SQLite Primary Key ::
 
      show you how to define the primary key for a table.
 
+
+*** SQLite =NOT NULL= Constraint
+- http://www.sqlitetutorial.net/sqlite-not-null-constraint/
+
 - SQLite NOT NULL constraint ::
 
      ensure values in a column are not NULL.
 
+
+*** SQLite =UNIQUE= Constraint
+- http://www.sqlitetutorial.net/sqlite-unique-constraint/
+
 - SQLite UNIQUE constraint ::
 
      ensure values in a column or a group of columns are unique.
+
+
+*** SQLite =CHECK= Constraint
+- http://www.sqlitetutorial.net/sqlite-check-constraint/
 
 - SQLite CHECK constraint ::
 
      ensure the values in a column meet a specified condition defined by an
      expression.
 
+
+*** SQLite =AUTOINCREMENT= Attribute
+- http://www.sqlitetutorial.net/sqlite-autoincrement/
+
 - SQLite AUTOINCREMENT ::
 
      explain how =AUTOINCREMENT= attribute works and why you should avoid using it.
+
+
+*** SQLite =ALTER TABLE= Statement
+- http://www.sqlitetutorial.net/sqlite-alter-table/
 
 - SQLite Alter Table ::
 
      show you how to use modify the structure of an existing table
 
+
+*** SQLite =DROP TABLE= Statement
+- http://www.sqlitetutorial.net/sqlite-drop-table/
+
 - SQLite Drop Table ::
 
      guide you how to remove a table from the database.
+
+
+*** SQLite =VACUUM= Command
+- http://www.sqlitetutorial.net/sqlite-vacuum/
 
 - SQLite VACUUM ::
 
                    show you how to optimize database file.
 
 ** Views
+- http://www.sqlitetutorial.net/sqlite-create-view/
 
 - SQLite Create View ::
 
       introduce you to the view concept and show you how to create a new view
      in the database.
 
+
+*Summary*: in this tutorial, you will learn how to use the SQLite =CREATE VIEW=
+statement to create a view.
+
+*** What is a view
+#+cindex:view definition
+#+cindex:stored query
+#+cindex:query, pack into named object
+In database theory, a /view/ is a result set of a stored query.  A view is the
+way to pack a query into a named object.
+
+#+cindex:base tables
+You can access the data of the underlying tables through the view.  The tables
+that the query in the view definition refers to are called /base tables/.
+
+A view is useful in some cases:
+
+  #+cindex:abstraction layer, view
+- First, views provide an abstraction layer over tables.  You can add and remove
+  the columns in the view without touching the schema of the underlying tables.
+
+  #+cindex:encapsulate complex queries, view
+- Second, you can use views to encapsulate complex queries with joins to
+  simplify the data access.
+
+
+SQLite view is read only.  It means you cannot use =INSERT=, =DELETE=, and
+=UPDATE= statement to update data in the base tables through the view.
+
+*** SQLite =CREATE VIEW= statement
+#+cindex:@command{CREATE VIEW} statement
+To create a view, you use the =CREATE VIEW= statement as follows:
+
+#+begin_src sql
+CREATE [TEMP] VIEW [IF NOT EXISTS] view_name(column-name-list)
+AS
+   select-statement;
+#+end_src
+
+#+cindex:@command{IF NOT EXISTS} option
+First, you need to assign the view a name.  The =IF NOT EXISTS= option helps
+you prevent an error of creating a view that already exists.
+
+Second, if you want the view to be only visible in the current database
+connection, you need to create a temporary view using the =TEMP= or =TEMPORARY=
+option.  SQLite automatically removes the temporary views whenever the database
+connection is closed.
+
+Third, you specify the =SELECT= statement for the view.  By default, the
+columns of the view derive from the result set of the =SELECT= statement.
+However, you can use different columns for the view by specifying the columns
+(=column-name-list=) explicitly after the view’s name.
+
+*** SQLite =CREATE VIEW= example
+The following query gets data from the tracks, albums, and genres tables in the
+sample database using the inner join clause.
+
+#+begin_src sql
+SELECT
+ trackid,
+ tracks.name,
+ albums.Title AS album,
+ media_types.Name AS media,
+ genres.Name AS genres
+FROM
+ tracks
+INNER JOIN albums ON Albums.AlbumId = tracks.AlbumId
+INNER JOIN media_types ON media_types.MediaTypeId = tracks.MediaTypeId
+INNER JOIN genres ON genres.GenreId = tracks.GenreId;
+#+end_src
+
+To create a view based on this query, you use the following statement:
+
+#+begin_src sql
+CREATE VIEW v_tracks
+AS
+SELECT
+ trackid,
+ tracks.name,
+ albums.Title AS album,
+ media_types.Name AS media,
+ genres.Name AS genres
+FROM
+ tracks
+INNER JOIN albums ON Albums.AlbumId = tracks.AlbumId
+INNER JOIN media_types ON media_types.MediaTypeId = tracks.MediaTypeId
+INNER JOIN genres ON genres.GenreId = tracks.GenreId;
+#+end_src
+
+From now on, you just use the following simple query instead of the complex one
+above.
+
+#+begin_src sql
+SELECT
+ *
+FROM
+ v_tracks;
+#+end_src
+
+*** Removing views
+#+cindex:@command{DROP VIEW} statement
+To remove a view from the database, you use the =DROP VIEW= statement as
+follows:
+
+: DROP VIEW [IF EXISTS] view_name;
+
+You need to specify the view name in the =DROP VIEW= statement to remove the
+view.  Note that the =DROP VIEW= statement removes the view object only; no
+actual data in the base tables is changed.
+
+#+cindex:@command{IF EXISTS} option
+If you remove an non-existent view, SQLite issues an error.  To avoid this, you
+use the =IF EXISTS= option.  In case the view does not exist and you try to
+remove it, SQLite just ignores the statement.
+
+For example, the following statement removes the v_tracks view from the
+database:
+
+: DROP VIEW v_tracks;
+
 ** Indexes
+
+*** SQLite Index
+- http://www.sqlitetutorial.net/sqlite-index/
 
 - SQLite Index ::
 
                   teach you about the index and how to utilize indexes to speed
                   up your queries.
+
+
+*Summary*: in this tutorial, you will learn how to use SQLite indexes to query
+data faster, speed up sort operation, and enforce unique constraints.
+
+**** What is an Index
+#+cindex:table, definition
+In relational databases, a table is a list of rows.  At the same time, each row
+has the same column structure that consists of cells.  Each row also has a
+consecutive =rowid= sequence number used to identify the row.  Therefore, we can
+consider a /table/ as a list of pairs: =(rowid, row)=.
+
+#+cindex:index, definition
+Unlike a table, an index has an opposite relationship: =(row, rowid)=.  An
+/index/ is an additional data structure that helps speed up querying, join, and
+grouping operations.
+
+[[file:figs/SQLite-Index.png][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/SQLite-Index.png]]
+
+#+cindex:B-tree index
+SQLite uses B-tree index.  =B= stands for /balanced/.  The B-tree keeps the
+amount of data on its both side balanced so that the number of levels that must
+be traversed to locate a row is always in the same approximate number.  In
+addition, querying using equality and ranges on B-tree indexes are very
+efficient.
+
+**** How indexes work
+Each index must be associated with a specific table.  An index consists of one
+or more columns, but all columns of an index must be in the same table.  A table
+may have multiple indexes.
+
+Whenever you create an index, SQLite creates a B-tree structure to hold the
+index data.
+
+The index contains data from the columns that you specify in the index and the
+corresponding rowid value.  This helps SQlite find the row quickly based on the
+values of the indexed columns.
+
+Imagine an index in the database like an index of a book.  By looking at the
+index, you can quickly identify the page number based on the keyword.
+
+**** SQLite =CREATE INDEX= statement
+#+cindex:@command{CREATE INDEX} statement
+To create an index, you use the =CREATE INDEX= statement.  The following
+illustrates its syntax:
+
+: CREATE [UNIQUE] INDEX index_name ON table_name(indexed_column);
+
+To create an index, you specify three important items of information:
+
+- The table that the index associated with.
+
+- The a list of indexed column.
+
+- The name of the index.
+
+
+#+cindex:@command{UNIQUE} option
+In case you want to make sure that the value of the column is unique like
+email, phone, etc., you use the =UNIQUE= option in the =CREATE INDEX=
+statement.
+
+**** SQLite =UNIQUE= index example
+Let’s create a new table named =contacts= for demonstration.
+
+#+begin_src sql
+CREATE TABLE contacts (
+ first_name text NOT NULL,
+ last_name text NOT NULL,
+ email text NOT NULL
+);
+#+end_src
+
+Suppose you want to enforce that the email is unique; you create a unique index
+as follows:
+
+: CREATE UNIQUE INDEX idx_contacts_email ON contacts (email);
+
+To test this, first, you insert a row into the =contacts= table.
+
+#+begin_src sql
+INSERT INTO contacts (first_name, last_name, email)
+VALUES
+ (
+ 'John',
+ 'Doe',
+ 'john.doe@sqlitetutorial.net'
+ );
+#+end_src
+
+Second, try to insert another row with a duplicate email.
+
+#+begin_src sql
+INSERT INTO contacts (first_name, last_name, email)
+VALUES
+ (
+ 'Johny',
+ 'Doe',
+ 'john.doe@sqlitetutorial.net'
+ );
+#+end_src
+
+SQLite issued an error message that the unique constraint failed.  This is
+because when you inserted the second row, SQLite checked and made sure that the
+email is unique across of rows in the contacts table.
+
+Let’s insert two more rows into the =contacts= table.
+
+#+begin_src sql
+INSERT INTO contacts (first_name, last_name, email)
+VALUES
+ (
+ 'David',
+ 'Brown',
+ 'david.brown@sqlitetutorial.net'
+ ),
+ (
+ 'Lisa',
+ 'Smith',
+ 'lisa.smith@sqlitetutorial.net'
+ );
+#+end_src
+
+If you query data in the contacts table using the email column, SQLite will use
+the index to locate the data.  See the following statement.
+
+#+begin_src sql
+SELECT
+ first_name,
+ last_name,
+ email
+FROM
+ contacts
+WHERE
+ email = 'lisa.smith@sqlitetutorial.net';
+#+end_src
+
+#+cindex:@command{EXPLAIN QUERY PLAN} statement
+To check if SQLite uses index or not, you use the =EXPLAIN QUERY PLAN=
+statement as follows:
+
+#+begin_src sql
+EXPLAIN QUERY PLAN
+SELECT
+ first_name,
+ last_name,
+ email
+FROM
+ contacts
+WHERE
+ email = 'lisa.smith@sqlitetutorial.net';
+#+end_src
+
+**** SQLite multicolumn index example
+If you create an index that consists of one column, SQLite uses that column as
+the sort key.  In case you create an index that has multiple columns, SQLite
+uses the additional columns as the second, third, … sort keys.
+
+SQLite sorts the data on the multicolumn index by the first column specified in
+the =CREATE INDEX= statement.  Then it sorts the duplicate values by the second
+column, and so on.
+
+Therefore, the column order is very important when you create the multicolumn
+index.
+
+To utilize a multicolumn index, the query must contain the condition that has
+the same column order as defined in the index.
+
+The following statement creates a multicolumn index on the =first_name= and
+=last_name= columns of the contacts table:
+
+#+begin_src sql
+CREATE INDEX idx_contacts_name 
+ON contacts (first_name, last_name);
+#+end_src
+
+If you query the contacts table with the one of following conditions in the
+=WHERE= clause, SQLite will utilize the multicolumn index to search for data.
+
+1. Querying by the =first_name= column.
+
+   #+begin_src sql
+   WHERE
+    first_name = 'John';
+   #+end_src
+
+2. Querying by both =first_name= and =last_name= columns:
+
+   #+begin_src sql
+   WHERE
+     first_name = 'John' AND last_name = 'Doe';
+   #+end_src
+
+
+However, SQLite will not use the multicolumn index if you use one of the
+following conditions.
+
+1. Querying by the =last_name= column only.
+
+   #+begin_src sql
+   WHERE
+     last_name = 'Doe';
+   #+end_src
+
+2. Querying by =first_name= OR =last_name= columns.
+
+   #+begin_src sql
+   last_name = 'Doe' OR first_name = 'John';
+   #+end_src
+
+
+**** SQLite =DROP INDEX= statement
+To remove an index, you use the =DROP INDEX= statement as follows:
+
+: DROP INDEX [IF EXISTS] index_name;
+
+The =IF EXISTS= option prevents you from an error of removing a non-existent
+index.
+
+For example, to remove the =idx_contact_name= index, you use the following
+statement:
+
+: DROP INDEX idx_contacts_name;
+
+The =idx_contacts_name= index is removed completely from the disk.
+
+
+*** SQLIte Expression-based Index
+- http://www.sqlitetutorial.net/sqlite-index-expression/
 
 - SQLite Index for Expressions ::
 
@@ -2369,59 +3618,812 @@ views, indexes using SQL data definition language.
 
                     manage triggers in SQLite database.
 
-** Full-text search
+** Full-text Search
 
 - SQLite full-text search ::
 
      get started with the full-text search in SQLite.
 
-** SQLite tools
+** SQLite Tools
+*** SQLite Commands
+- http://www.sqlitetutorial.net/sqlite-commands/
 
 - SQLite Commands ::
 
      show you the most commonly used command in sqlite3 program.
 
+
+*Summary*: in this tutorial, we will introduce you to the most commonly used
+SQLite commands of the ~sqlite3~ command line program.
+
+The SQLite project delivers a simple command-line tool named ~sqlite3~ (or
+sqlite3.exe on Windows) that allows you to interact with the SQLite databases
+using SQL statements and commands.
+
+**** Connect to an SQLite database
+To start the ~sqlite3~, you type the ~sqlite3~ as follows:
+
+#+begin_src sh
+>sqlite3
+SQLite version 3.13.0 2016-05-18 10:57:30
+Enter ".help" for usage hints.
+Connected to a transient in-memory database.
+Use ".open FILENAME" to reopen on a persistent database.
+sqlite>
+#+end_src
+
+By default, an SQLite session uses the in-memory database; therefore all
+changes will be gone when the session ends.
+
+To open a database file, you use the ~.open FILENAME~ command.  The following
+statement ~open~'S the ~chinook.db~ database:
+
+: sqlite> .open c:\sqlite\chinook.db
+
+If you want to open a specific database file when you connect to the SQlite
+database, you use the following command:
+
+#+begin_src sh
+>sqlite3 c:\sqlite\chinook.db
+SQLite version 3.13.0 2016-05-18 10:57:30
+Enter ".help" for usage hints.
+sqlite>
+#+end_src
+
+If you start a session with a database name that does not exist, the ~sqlite3~
+tool will create the database file.
+
+For example, the following command creates a database named =sales= in the
+~C:\sqlite\ directory~:
+
+#+begin_src sh
+>sqlite3 c:\sqlite\sales.db
+SQLite version 3.13.0 2016-05-18 10:57:30
+Enter ".help" for usage hints.
+sqlite>
+#+end_src
+
+**** Show all available commands and their purposes
+#+cindex:@command{.help} command
+To show all available commands and their purpose, you use the ~.help~ command as
+follows:
+
+: .help
+
+**** Show databases in the current database connection
+#+cindex:@command{.databases} command
+To show all databases in the current connection, you use the ~.databases~
+command.  The ~.databases~ command displays at least one database with the
+name: =main=.
+
+For example, the following command shows all the databases of the current
+connection:
+
+#+begin_src sh
+sqlite> .database
+seq  name             file
+---  ---------------  --------------------------
+0    main             c:\sqlite\sales.db
+sqlite>
+#+end_src
+
+To add an additional database in the current connection, you use the =ATTACH
+DATABASE= statement.  The following statement adds the =chinook= database to
+the current connection.
+
+: sqlite> ATTACH DATABASE "c:\sqlite\chinook.db" AS chinook;
+
+Now if you run the ~.database~ command again, the ~sqlite3~ returns two
+databases: =main= and =chinook=.
+
+#+begin_src sh
+sqlite> .databases
+seq  name             file
+---  ---------------  ---------------------
+0    main             c:\sqlite\sales.db
+2    chinook          c:\sqlite\chinook.db
+#+end_src
+
+**** Exit ~sqlite3~ tool
+#+cindex:@command{.exit} command
+To exit the ~sqlite3~ program, you use the ~.exit~ command.
+
+: sqlite>.exit
+
+**** Show tables in a database
+#+cindex:@command{.tables} command
+To display all the tables in the current database, you use the ~.tables~
+command.  The following commands open a new database connection to the
+=chinook= database and display the tables in the database.
+
+#+begin_src sh
+>sqlite3 c:\sqlite\chinook.db
+SQLite version 3.13.0 2016-05-18 10:57:30
+Enter ".help" for usage hints.
+sqlite> .tables
+albums          employees       invoices        playlists
+artists         genres          media_types     tracks
+customers       invoice_items   playlist_track
+sqlite>
+#+end_src
+
+#+cindex:@command{.table pattern} command
+#+cindex:@command{LIKE} operator
+If you want to find tables based on a specific pattern, you use the ~.table
+pattern~ command.  The ~sqlite3~ uses the =LIKE= operator for pattern matching.
+
+For example, the following statement returns the table that ends with the
+string =es=.
+
+#+begin_src sh
+sqlite> .table '%es'
+employees    genres       invoices     media_types
+sqlite>
+#+end_src
+
+**** Show the structure of a table
+#+cindex:@command{.schema TABLE} command
+#+cindex:schema
+To display the structure of a table, you use the ~.schema TABLE~ command.  The
+=TABLE= argument could be a pattern.  If you omit it, the ~.schema~ command
+will show the structures of all the tables.
+
+The following command shows the structure of the =albums= table.
+
+#+begin_src sql
+sqlite> .schema albums
+CREATE TABLE "albums"
+(
+    [AlbumId] INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    [Title] NVARCHAR(160)  NOT NULL,
+    [ArtistId] INTEGER  NOT NULL,
+    FOREIGN KEY ([ArtistId]) REFERENCES "artists" ([ArtistId])
+                ON DELETE NO ACTION ON UPDATE NO ACTION
+);
+CREATE INDEX [IFK_AlbumArtistId] ON "albums" ([ArtistId]);
+sqlite>
+#+end_src
+
+#+cindex:@command{.fullschema} command
+To show the schema and the content of the =sqlite_stat= tables, you use the
+~.fullschema~ command.
+
+: sqlite>.fullschema
+
+**** Show indexes
+#+cindex:@command{.indexes} command
+To show all indexes of the current database, you use the ~.indexes~ command as
+follows:
+
+#+begin_src sh
+sqlite> .indexes
+IFK_AlbumArtistId
+IFK_CustomerSupportRepId
+IFK_EmployeeReportsTo
+IFK_InvoiceCustomerId
+IFK_InvoiceLineInvoiceId
+IFK_InvoiceLineTrackId
+IFK_PlaylistTrackTrackId
+IFK_TrackAlbumId
+IFK_TrackGenreId
+IFK_TrackMediaTypeId
+#+end_src
+
+#+cindex:@command{.indexes TABLE} command
+To show the indexes of a specific table, you use the ~.indexes TABLE~ command.
+For example, to show indexes of the =albums= table, you use the following
+command:
+
+#+begin_src sh
+sqlite> .indexes albums
+IFK_AlbumArtistId
+#+end_src
+
+To show indexes of the tables whose names end with =es=, you use a pattern of
+the =LIKE= operator.
+
+#+begin_src sh
+sqlite> .indexes %es
+IFK_EmployeeReportsTo
+IFK_InvoiceCustomerId
+#+end_src
+
+**** Save the result of a query into a file
+#+cindex:@command{.output FILENAME} command
+#+cindex:@command{.once FILENAME} command
+To save the result of a query into a file, you use the ~.output FILENAME~
+command.  Once you issue the ~.output~ command, all the results of the
+subsequent queries will be saved to the file that you specified in the FILENAME
+argument.  If you want to save the result of the next single query only to the
+file, you issue the ~.once FILENAME~ command.
+
+To display the result of the query to the standard output again, you issue the
+~.output~ command without arguments.
+
+The following commands select the title from the =albums= table and write the
+result to the ~albums.txt~ file.
+
+#+begin_src sh
+sqlite> .output albums.txt
+sqlite> SELECT title FROM albums;
+#+end_src
+
+**** Execute SQL statements from a file
+Suppose we have a file named ~commands.txt~ in the ~c:/sqlite/~ folder with the
+following content:
+
+#+begin_src sql
+SELECT albumid, title
+FROM albums
+ORDER BY title
+LIMIT 10;
+#+end_src
+
+#+cindex:@command{.read FILENAME} command
+#+cindex:execute SQL from file
+#+cindex:file, execute statements from
+To execute the SQL statements in the ~commands.txt~ file, you use the ~.read
+FILENAME~ command as follows:
+
+#+begin_src sh
+sqlite> .mode column
+sqlite> .read c:/sqlite/commands.txt
+156         ...And Justice For All
+257         20th Century Masters -
+296         A Copland Celebration,
+94          A Matter of Life and D
+95          A Real Dead One
+96          A Real Live One
+285         A Soprano Inspired
+139         A TempestadeTempestade
+203         A-Sides
+160         Ace Of Spades
+#+end_src
+
+*** SQLite =SHOW TABLES=
+- http://www.sqlitetutorial.net
+
 - SQLite Show Tables ::
 
      list all tables in a database.
+
+
+*Summary*: in this tutorial, you will learn various ways to show tables from an
+SQLite database by using SQLite command line shell program or by querying data
+from =sqlite_master= tables.
+
+**** Showing tables using the sqlite command line shell program
+To show tables in a database using the ~sqlite3~ command line shell program,
+you follow these steps:
+
+First, open the database that you want to show the tables:
+
+: sqlite> sqlite3 c:\sqlite\db\chinook.db
+
+The above statement opened the database named ~chinook.db~ that locates in the
+~c:\sqlite\db~ directory.
+
+#+cindex:@command{.tables} command
+Second, type the ~.tables~ command:
+
+: sqlite> .tables
+
+The ~.tables~ command lists all tables in the =chinook= database:
+
+#+begin_src sh
+albums          employees       invoices        playlists
+artists         genres          media_types     tracks
+customers       invoice_items   playlist_track
+#+end_src
+
+#+cindex:@command{.table} command
+#+cindex:@command{.ta} command
+Note that both ~.tables~, ~.table~ have the same effect.  In addition, the
+command ~.ta~ should work too.
+
+The ~.tables~ command also can be used to show temporary tables.  See the
+following example:
+
+#+cindex:@command{CREATE TEMPORARY TABLE} command
+First, create a new temporary table named =temp_table1=:
+
+: sqlite> CREATE TEMPORARY TABLE temp_table1( name TEXT );
+
+Second, list all tables from the database:
+
+: sqlite> .tables
+
+The following shows the output:
+
+#+begin_src sh
+albums            employees         invoices          playlists
+artists           genres            media_types       temp.temp_table1
+customers         invoice_items     playlist_track    tracks
+#+end_src
+
+Because the schema of temporary tables is =temp=, the command showed the names
+of schema and table of the temporary table such as =temp.temp_table1=.
+
+If you want to show tables with the specific name, you can add a matching
+pattern:
+
+: .tables pattern
+
+The command works the same as =LIKE= operator.  The pattern must be surrounded
+by single quotation marks (='=).
+
+For example, to find tables whose names start with the letter ‘a’, you use the
+following command:
+
+: sqlite> .table 'a%'
+
+Here is the output:
+
+: albums   artists
+
+To show the tables whose name contains the string =ck=, you use the =%ck%=
+pattern as shown in the following command:
+
+: sqlite> .tables '%ck%'
+
+The output is as follows:
+
+: playlist_track  tracks
+
+**** Showing tables using SQL statement
+Another way to list all tables in a database is to query them from the
+=sqlite_master= table.
+
+#+begin_src sql
+SELECT 
+    name
+FROM 
+    sqlite_master 
+WHERE 
+    type ='table' AND 
+    name NOT LIKE 'sqlite_%';
+#+end_src
+
+In this query, we filtered out all tables whose names start with =sqlite_=n
+such as =sqlite_stat1= and =sqlite_sequence= tables.  These tables are the
+system tables managed internally by SQLite.
+
+*** SQLite =DESCRIBE TABLE=
+- http://www.sqlitetutorial.net/sqlite-tutorial/sqlite-describe-table/
 
 - SQLite Describe Table ::
 
      show the structure of a table.
 
+
+*Summary*: in this tutorial, you will learn about various ways to show the
+structure of a table in SQLite.
+
+**** Getting the structure of a table via the SQLite command line shell program
+To find out the structure of a table via SQLite command line shell program, you
+follow these steps:
+
+First, connect to a database via the SQLite command line shell program:
+
+: sqlite> sqlite3 c:\sqlite\db\chinook.db
+
+Then, issue the following command:
+
+#+cindex:@command{.schema TABLE_NAME} command
+: .schema table_name
+
+For example, to show the statement that created the =albums= table, you use the
+following command:
+
+: sqlite> .schema albums
+
+Notice that you should /NOT/ use the semicolon (=;=).
+
+Here is the output:
+
+#+begin_src sql
+CREATE TABLE IF NOT EXISTS "albums"
+(
+    [AlbumId] INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    [Title] NVARCHAR(160)  NOT NULL,
+    [ArtistId] INTEGER  NOT NULL,
+    FOREIGN KEY ([ArtistId]) REFERENCES "artists" ([ArtistId])
+                ON DELETE NO ACTION ON UPDATE NO ACTION
+);
+CREATE INDEX [IFK_AlbumArtistId] ON "albums" ([ArtistId]);
+#+end_src
+
+Another way to show the structure of a table is to use the following pragma
+command:
+
+#+begin_src sh
+sqlite> .header on
+sqlite> .mode column
+sqlite> pragma table_info('albums');
+#+end_src
+
+Note that the first two commands are used to format the output nicely.
+
+**** Getting the structure of a table using SQL statement
+You can find the structure of a table by querying it from the =sqlite_master=
+table as follows:
+
+#+begin_src sql
+SELECT
+    sql 
+FROM 
+    sqlite_master 
+WHERE 
+    name = 'albums';
+#+end_src
+
+Here is the output:
+
+#+begin_src sql
+sql
+----
+CREATE TABLE "albums"
+(
+    [AlbumId] INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    [Title] NVARCHAR(160)  NOT NULL,
+    [ArtistId] INTEGER  NOT NULL,
+    FOREIGN KEY ([ArtistId]) REFERENCES "artists" ([ArtistId])
+                ON DELETE NO ACTION ON UPDATE NO ACTION
+)
+#+end_src
+
+*** SQLite ~.dump~ Command
+- http://www.sqlitetutorial.net/sqlite-dump/
+
 - SQLite Dump ::
 
                  how to use dump command to backup and restore a database.
+
+
+*Summary*: in this tutorial, you will learn how to use the SQLite dump command
+to backup and restore a database.
+
+SQLite project delivers the ~sqlite3~ tool that allows you to interact with the
+SQLite database using command-line shell program.
+
+By using the ~sqlite3~ tool, you can use the SQL statements to query or update
+data in the database.  In addition, you can use special commands, which are
+known as dot-commands to perform various useful database operations.
+
+#+cindex:@command{.dump} command
+One of these dot-commands is the ~.dump~ command that gives you the ability to
+dump the entire database or tables into a text file.
+
+**** Dump the entire database into a file using SQLite dump command
+The following command opens a new SQLite database connection to the
+~chinook.db~ file.
+
+#+begin_src sh
+C:\sqlite>sqlite3 c:/sqlite/chinook.db
+SQLite version 3.13.0 2016-05-18 10:57:30
+Enter ".help" for usage hints.
+sqlite>
+#+end_src
+
+To dump a database into a file, you use the ~.dump~ command.  The ~.dump~
+command converts the entire structure and data of an SQLite database into a
+single text file.
+
+#+cindex:@command{.output FILENAME} command
+By default, the ~.dump~ command outputs the SQL statements on screen.  To issue
+the output to a file, you use the ~.output FILENAME~ command.
+
+The following commands specify the output of the dump file to ~chinook.sql~ and
+dump the =chinook= database into the ~chinook.sql~ file.
+
+#+begin_src sh
+sqlite> .output c:/sqlite/chinook.sql
+sqlite> .dump
+sqlite> .exit
+#+end_src
+
+**** Dump a specific table using the SQLite dump command
+If you want to dump a specific table, you need to specify the table name
+followed the ~.dump~ command.  For example, the following command saves the
+=albums= table to the ~albums.sql~ file.
+
+#+begin_src sh
+sqlite> .output c:/sqlite/albums.sql
+sqlite> .dump albums
+sqlite> .quit
+#+end_src
+
+The following picture shows the content of the ~albums.sql~ file.
+
+[[file:figs/SQLite-dump-example.png][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/SQLite-dump-example.png]]
+
+**** Dump tables structure only using schema command
+If you want to dump the structures of tables in a database, you use the
+~.schema~ command.  The following commands set the output file to
+=chinook_structure.sql= file and save the structures of tables into the
+=chinook_structure.sql= file.
+
+#+begin_src sh
+sqlite> .output c:/sqlite/chinook_structure.sql
+sqlite> .schema
+sqlite> .quit
+#+end_src
+
+The following picture shows the content of the =chinook_structure.sql= file.
+
+[[file:figs/SQLite-dump-structure.png][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/SQLite-dump-structure.png]]
+
+**** Dump data of one or more tables into a file
+To dump the data of a table into a text file, you use these steps:
+
+#+cindex:@command{.mode} command
+#+cindex:mode
+First, set the mode to =insert= using the ~.mode~ command as follows:
+
+: sqlite> .mode insert
+
+From now on, every =SELECT= statement will issue the result as the =INSERT=
+statements instead of pure text data.
+
+Second, set the output to a text file instead of the default standard output.
+The following command sets the output file to the ~data.sql~ file.
+
+: sqlite> .output data.sql
+
+Third, issue the =SELECT= statements to query data from a table that you want
+to dump.  The following command returns data from the =artists= table.
+
+: sqlite> select * from artists;
+
+Check the content of the ~data.sql~ file; if everything is fine, you will see
+the following output:
+
+[[file:figs/SQLite-dump-data-only.png][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/SQLite-dump-data-only.png]]
+
+To dump data from other tables, you need to issue the =SELECT= statements to
+query data from those tables.
+
+*** SQLite ~.import~ Command
+- http://www.sqlitetutorial.net/sqlite-import-csv/
 
 - SQLite Import CSV ::
 
      how to import CSV file into a table.
 
+
+*Summary*: this tutorial shows you various ways to import CSV data into an
+SQLite table using ~sqlite3~ and SQLite Studio tools.
+
+**** Importing a CSV file into a table using ~sqlite3~ tool
+In the first scenario, you want to import data from CSV file into a table that
+does not exist in the SQLite database.
+
+1. First, the ~sqlite3~ tool creates the table.  The ~sqlite3~ tool uses the
+   first row of the CSV file as the names of the columns of the table.
+
+2. Second, the ~sqlite3~ tool imports data from the second row of the CSV file
+   into the table.
+
+
+We will import a CSV file named ~city.csv~ with two columns: name and
+population.  You can download it here for practicing.
+
+[[http://www.sqlitetutorial.net/wp-content/uploads/2016/05/city.csv][Download the city.csv file]]
+
+To import the ~c:\sqlite\city.csv~ file into the =cities= table:
+
+#+cindex:CSV mode
+#+cindex:mode, CSV
+First, set the mode to =CSV= to instruct the command-line shell program to
+interpret the input file as a CSV file.  To do this, you use the ~.mode~
+command as follows:
+
+: sqlite> .mode csv
+
+#+cindex:@command{.import FILE TABLE} command
+Second, use the ~.import FILE TABLE~ command to import the data from the
+~city.csv~ file into the =cities= table.
+
+: sqlite>.import c:/sqlite/city.csv cities
+
+To verify the import, you use the ~.schema~ command to display the structure of
+the =cities= table.
+
+#+begin_src sh
+sqlite> .schema cities
+CREATE TABLE cities(
+  "name" TEXT,
+  "population" TEXT
+);
+#+end_src
+
+To view the data of the cities table, you use the following =SELECT= statement.
+
+#+begin_src sql
+SELECT name, 
+       population
+FROM cities;
+#+end_src
+
+In the second scenario, the table is already available in the database and you
+just need to import the data.
+
+First, remove the =cities= table that you have created.
+
+: DROP TABLE IF EXISTS cities;
+
+Second, use the following =CREATE TABLE= statement to create the =cities=
+table.
+
+#+begin_src sql
+CREATE TABLE cities(
+  name TEXT NOT NULL,
+  population INTEGER NOT NULL 
+);
+#+end_src
+
+If the table already exists, the ~sqlite3~ tool uses all the rows, including
+the first row, in the CSV file as the actual data to import.  Therefore, you
+should delete the first row of the CSV file.
+
+The following commands import the =city_without_header.csv= file into the
+=cities= table.
+
+#+begin_src sh
+sqlite> .mode csv
+sqlite> .import c:/sqlite/city_no_header.csv cities
+#+end_src
+
+*** SQLite ~.export~ Command
+- http://www.sqlitetutorial.net//sqlite-tutorial/sqlite-export-csv/
+
 - SQLite Export CSV ::
 
      how to export an SQLite database to CSV files.
 
-* SQLite Functions
 
+*Summary*: in this tutorial, you will learn how to export SQLite database to a
+CSV file.
+
+**** Export SQLite Database to a CSV file using sqlite3 tool
+SQLite project provides you with a command-line program called ~sqlite3~ or
+sqlite3.exe on Windows.  By using the ~sqlite3~ tool, you can use the SQL
+statements and dot-commands to interact with the SQLite database.
+
+#+cindex:exort data to CSV
+#+cindex:CSV mode, export
+To export data from the SQLite database to a CSV file, you use these steps:
+
+1. Turn on the header of the result set using the ~.header on~ command.
+
+2. Set the output mode to =CSV= to instruct the ~sqlite3~ tool to issue the
+   result in the =CSV= mode.
+
+3. Send the output to a CSV file.
+
+4. Issue the query to select data from the table to which you want to export.
+
+
+The following commands select data from the customers table and export it to
+the ~data.csv~ file.
+
+#+begin_src sh
+>sqlite3 c:/sqlite/chinook.db
+sqlite> .headers on
+sqlite> .mode csv
+sqlite> .output data.csv
+sqlite> SELECT customerid,
+   ...>        firstname,
+   ...>        lastname,
+   ...>        company
+   ...>   FROM customers;
+sqlite> .quit
+#+end_src
+
+If you check the ~data.csv~ file, you will see the following output.
+
+[[file:figs/SQLite-Export-CSV-example.png][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/SQLite-Export-CSV-example.png]]
+
+Besides using the dot-commands, you can use the options of the ~sqlite3~ tool
+to export data from the SQLite database to a CSV file.
+
+For example, the following command exports the data from the =tracks= table to
+a CSV file named ~tracks.csv~.
+
+: >sqlite3 -header -csv c:/sqlite/chinook.db "select * from tracks;" > tracks.csv
+
+[[file:figs/SQLite-Export-CSV-one-liner-option.png][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/SQLite-Export-CSV-one-liner-option.png]]
+
+If you have a file named ~query.sql~ that contains the script to query data,
+you can execute the statements in the file and export data to a CSV file.
+
+: >sqlite3 -header -csv c:/sqlite/chinook.db < query.sql > data.csv
+
+* SQLite Functions
 ** SQLite Aggregate Functions
+- http://www.sqlitetutorial.net/sqlite-aggregate-functions/
+
 This tutorial shows you how to use the SQLite aggregate functions to find the
 maximum, minimum, average, sum, and count of a set of values.
 
+*Summary*: in this tutorial, you will learn about the SQLite aggregate
+functions to find the maximum, minimum, average, sum, and count of a set of
+values.
+*** Overview of SQLite aggregate functions
+Aggregate functions operate on a set of rows and return a single result.
+Aggregate functions are often used in conjunction with =GROUP BY= and =HAVING=
+clauses in the =SELECT= statement.
+
+SQLite provides the following aggregate functions:
+
+- AVG() – returns the average value of a group.
+
+- COUNT() – returns the number of rows that match a specified condition
+
+- MAX() – returns the maximum value in a group.
+
+- MIN() – returns the minimum value in a group
+
+- SUM() – returns the sum of values
+
+- =GROUP_CONCAT(expression, separator)= – returns a string that is the
+  concatenation of all non-NULL values of the input expression separated by the
+  separator.
+*** SQLite aggregate function syntax
+The following shows the syntax of calling an aggregate function except for the
+=GROUP_CONCAT()= function:
+
+: aggregate_function (DISTINCT | ALL expression)
+
+In this syntax:
+
+- First, specify the name of the aggregate function such as =AVG=, =SUM=, or
+  =COUNT=
+
+- Second, specify the expression to which the aggregate function applies.
+
+
+=DISTINCT= instructs the aggregate function to consider only unique values in
+the calculation while =ALL= allows the aggregate function to take all values
+including duplicates in its calculation.
+
+*** SQLite aggregate function examples
+
 ** SQLite Date Functions
+- http://www.sqlitetutorial.net/sqlite-date-functions/
+
 This section provides you with SQLite date and time functions that help you
 manipulate datetime data effectively.
 
+| Name      | Description                                                                                           |
+|-----------+-------------------------------------------------------------------------------------------------------|
+| DATE      | calculate a date value based on multiple date modifiers.                                              |
+| TIME      | calculate a time value based on multiple date modifiers.                                              |
+| DATETIME  | calculate a date & time value based on one or more date modifiers.                                    |
+| JULIANDAY | returns the Julian day, which is the number of days since noon in Greenwich on November 24, 4714 B.C. |
+| STRFTIME  | format a date value based on a specified format string.                                               |
+|-----------+-------------------------------------------------------------------------------------------------------|
+
 ** SQLite String Functions
+- http://www.sqlitetutorial.net/sqlite-string-functions/
+
+
 This section shows the most commonly used SQLite string functions that help you
 manipulate character string data effectively.
 
+The following table shows the commonly used SQLite string functions that
+perform an operation on an input string and return a new string or a numeric
+value.
+
 ** SQLite Window Functions
+- http://www.sqlitetutorial.net/sqlite-window-functions/
+
+
 SQLite window functions perform a calculation on a set of rows that are related
 to the current row. Unlike aggregate functions, window functions do not cause
 rows to become grouped into a single result row.
 
 * SQLite Programming Interfaces
-
 ** SQLite Java
 This SQLite Java section teaches you step by step how to interact with SQLite
 database using Java JDBC API.
@@ -2436,8 +4438,33 @@ will walk you through the steps of setting up PHP project structure, connecting
 to the SQLite database, and performing the common database operations.
 
 ** SQLite Node.js
+- http://www.sqlitetutorial.net/sqlite-nodejs/
+
+
 This section shows you how to interact with SQLite databases from Node.js
 applications using the node sqlite3 module.
+
+In this section, you will learn how to interact with SQLite databases from a
+Node.js application using the ~sqlite3~ module.  After the tutorial, you will
+know how to open a database connection and perform common database operations
+such as select, insert, update, and delete.  In addition, you will learn how to
+execute SQL statements in serialized mode or in parallel mode.
+
+The ~sqlite3~ module is actively maintained and provides a rich set of
+features:
+
+- Simple API for query execution
+- Parameters binding support
+- Control the query execution flow, supporting both serialized and parallel
+  modes.
+- Comprehensive debugging support
+- Full caching / Blob support
+- SQLite extension support
+- Bundles SQLite as a fallback
+
+
+To understand how the ~sqlite3~ module works, you can use the following
+tutorials in sequence:
 
 * SQLite Resources
 - http://www.sqlitetutorial.net/sqlite-resources/
