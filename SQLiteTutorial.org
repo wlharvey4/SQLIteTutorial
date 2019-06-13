@@ -1,8 +1,8 @@
 # -*- mode:org; fill-column:79; -*-
 #+title:SQLite Tutorial
 #+subtitle:{{{version}}}
-#+date:2019-06-13 13:31
-#+macro:version Version 0.0.7 {{{date}}}
+#+date:2019-06-13 14:04
+#+macro:version Version 0.0.8 {{{date}}}
 * Introduction
 - [[https://www.sqlite.org/index.html][SQLite Home]]
 - [[https://www.sqlite.org/docs.html][SQLite Documentation]]
@@ -649,6 +649,13 @@ You can download the SQLite sample database using the following link:
 
 - [[http://www.sqlitetutorial.net/wp-content/uploads/2018/03/chinook.zip][Download SQLite Sample Database]]
 
+#+name:download-chinook-db
+#+begin_src sh :dir db :results output
+curl -O http://www.sqlitetutorial.net/wp-content/uploads/2018/03/chinook.zip
+#+end_src
+
+#+RESULTS: download-chinook-db
+
 *** Connect to SQLite Sample Database
 
 #+cindex:connect to sample database
@@ -690,6 +697,9 @@ The SQLite project delivers a simple command-line tool named ~sqlite3~ (or
 using SQL statements and commands.
 
 *** Connect to an SQLite database
+
+{{{heading(Connect using ~sqlite3~)}}}
+
 To start the ~sqlite3~, you type the ~sqlite3~ as follows:
 
 #+begin_src sh
@@ -739,6 +749,9 @@ sqlite>
 
 *** Show all available commands and their purposes
 #+cindex:@command{.help} command
+
+{{{heading(All Available Commands: ~.help~)}}}
+
 To show all available commands and their purpose, you use the ~.help~ command
 as follows:
 
@@ -747,6 +760,9 @@ as follows:
 *** Show databases in the current database connection
 #+cindex:@command{.databases} command
 #+cindex:@code{main} database
+
+{{{heading(All Connected Databases: ~.databases~)}}}
+
 To show all databases in the current connection, you use the ~.databases~
 command.  The ~.databases~ command displays at least one database with the
 name: ~main~.
@@ -761,6 +777,8 @@ seq  name             file
 0    main             c:\sqlite\sales.db
 sqlite>
 #+end_src
+
+{{{heading(ATTACH DATABASE ... AS)}}}
 
 #+cindex:@command{ATTACH DATABASE} statement
 To add an additional database in the current connection, you use the =ATTACH
@@ -780,13 +798,19 @@ seq  name             file
 2    chinook          c:\sqlite\chinook.db
 #+end_src
 
-*** Exit sqlite3 tool
+*** Exit sqlite3
+
+{{{heading(.exit Command)}}}
+
 #+cindex:@command{.exit} command
 To exit the ~sqlite3~ program, you use the ~.exit~ command.
 
 : sqlite>.exit
 
 *** Show tables in a database
+
+{{{heading(Show Tables in DB: ~.tables~)}}}
+
 #+cindex:@command{.tables} command
 To display all the tables in the current database, you use the ~.tables~
 command.  The following commands open a new database connection to the
@@ -803,6 +827,8 @@ customers       invoice_items   playlist_track
 sqlite>
 #+end_src
 
+{{{subheading(.tables <pattern>)}}}
+
 #+cindex:@command{.table} pattern command
 #+cindex:@command{LIKE} operator
 If you want to find tables based on a specific pattern, you use the ~.table~
@@ -818,6 +844,9 @@ sqlite>
 #+end_src
 
 *** Show the structure of a table
+
+{{{heading(Show Table Structure: ~.schema <table | pattern>~)}}}
+
 #+cindex:@command{.schema} command
 To display the structure of a table, you use the ~.schema TABLE~ command.  The
 =TABLE= argument could be a pattern.  If you omit it, the ~.schema~ command will
@@ -839,6 +868,8 @@ CREATE INDEX [IFK_AlbumArtistId] ON "albums" ([ArtistId]);
 sqlite>
 #+end_src
 
+{{{subheading(~.fullschema~)}}}
+
 #+cindex:@command{.fullschema} command
 To show the schema and the content of the =sqlite_stat= tables, you use the
 ~.fullschema~ command.
@@ -846,11 +877,14 @@ To show the schema and the content of the =sqlite_stat= tables, you use the
 : sqlite>.fullschema
 
 *** Show indexes
+
+{{{heading(Show All Indexes of DB: ~.indexes <table | pattern>~)}}}
+
 #+cindex:@command{.indexes} command
 To show all indexes of the current database, you use the ~.indexes~ command as
 follows:
 
-#+begin_src text
+#+begin_src sh
 sqlite> .indexes
 IFK_AlbumArtistId
 IFK_CustomerSupportRepId
@@ -884,6 +918,11 @@ IFK_InvoiceCustomerId
 #+end_src
 
 *** Save the result of a query into a file
+
+{{{heading(Save Query Results in File: ~.output <filename>~)}}}
+
+{{{subheading(~.once <filename>~)}}}
+
 #+cindex:@command{.output} command
 #+cindex:@command{.once} command
 To save the result of a query into a file, you use the ~.output FILENAME~
@@ -892,10 +931,12 @@ subsequent queries will be saved to the file that you specified in the
 =FILENAME= argument.  If you want to save the result of the next single query
 only to the file, you issue the ~.once FILENAME~ command.
 
+{{{subheading(~.output~)}}}
+
 To display the result of the query to the standard output again, you issue the
 ~.output~ command without arguments.
 
-The following commands select the title from the albums table and write the
+The following commands select the title from the =albums= table and write the
 result to the ~albums.txt~ file.
 
 #+begin_src sql
@@ -914,6 +955,9 @@ ORDER BY title
 LIMIT 10;
 #+end_src
 
+{{{heading(Execute SQL Statements from File: ~.read <filename>~)}}}
+
+#+cindex:@command{.read} command
 To execute the SQL statements in the ~commands.txt~ file, you use the ~.read
 FILENAME~ command as follows:
 
@@ -4544,5 +4588,5 @@ tutorials in sequence:
 
 * Local Variables                                                  :noexport:
 # Local variables:
-# time-stamp-pattern:"8/^\\#\\+date:%:y-%02m-%02d %:H:%:M$"
+# time-stamp-pattern:"8/^\\#\\+date:%:y-%02m-%02d %02H:%02M$"
 # End:
