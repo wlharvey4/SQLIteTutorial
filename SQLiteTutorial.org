@@ -1,8 +1,8 @@
 # -*- mode:org; fill-column:79; -*-
 #+title:SQLite Tutorial
 #+subtitle:{{{version}}}
-#+date:2019-06-13 14:04
-#+macro:version Version 0.0.8 {{{date}}}
+#+date:2019-06-14 10:22
+#+macro:version Version 0.0.9 {{{date}}}
 * Introduction
 - [[https://www.sqlite.org/index.html][SQLite Home]]
 - [[https://www.sqlite.org/docs.html][SQLite Documentation]]
@@ -49,9 +49,9 @@ with SQLite.  Follow these 3-easy steps to get started with SQLite fast.
 ** What is SQLite
 - http://www.sqlitetutorial.net/what-is-sqlite/
 
-*Summary*: this tutorial gives you a brief overview of SQLite and the SQLite’s
-distinctive features that make SQLite the most widely deployed SQL database
-engine.
+- *Summary* :: this tutorial gives you a brief overview of SQLite and the
+               SQLite’s distinctive features that make SQLite the most widely
+               deployed SQL database engine.
 
 SQLite is a software library that provides a relational database management
 system.  The /lite/ in SQLite means light weight in terms of setup, database
@@ -411,8 +411,8 @@ configuration or maintenance.  It keeps thing simple.  SQLite "just works".
 
 #+cindex:download SQLite
 #+cindex:install SQLite
-*Summary*: This tutorial shows you step by step how to download and install
-SQLite on your computer.
+- *Summary* :: This tutorial shows you step by step how to download and install
+               SQLite on your computer.
 
 {{{heading(Download SQLite)}}}
 
@@ -562,10 +562,11 @@ into a folder e.g., ~/usr/local/sqlite/gui/~ and run it.
 ** The SQLite Sample Database
 - http://www.sqlitetutorial.net/sqlite-sample-database/
 
-*Summary*: in this tutorial, we first introduce you to an SQLite sample
-database.  Then, we will give you the links to download the sample database and
-its diagram.  At the end of the tutorial, we will show you how to connect to
-the sample database using the ~sqlite3~ tool.
+- *Summary* :: in this tutorial, we first introduce you to an SQLite sample
+               database.  Then, we will give you the links to download the
+               sample database and its diagram.  At the end of the tutorial, we
+               will show you how to connect to the sample database using the
+               ~sqlite3~ tool.
 
 *** Introduction to chinook SQLite sample database
 #+cindex:@file{chinook.db}
@@ -689,8 +690,8 @@ The name of the file is ~chinook.db~.
 - http://www.sqlitetutorial.net/sqlite-commands/
 
   #+cindex:@command{sqlite3} command-line tool
-*Summary*: in this tutorial, we will introduce you to the most commonly used
-SQLite commands of the ~sqlite3~ command line program.
+- *Summary* :: in this tutorial, we will introduce you to the most commonly
+               used SQLite commands of the ~sqlite3~ command line program.
 
 The SQLite project delivers a simple command-line tool named ~sqlite3~ (or
 ~sqlite3.exe~ on Windows) that allows you to interact with the SQLite databases
@@ -992,14 +993,16 @@ will first start querying data from the [[http://www.sqlitetutorial.net/sqlite-s
 
 
 #+cindex:@command{SELECT} statement
-*Summary*: in this tutorial, you will learn how to use SQLite =SELECT=
-statement to query data from a single table.
+- *Summary* :: in this tutorial, you will learn how to use the SQLite =SELECT=
+               statement to query data from a single table.
 
-The =SELECT= statement is the most commonly used statements in SQL.  The SQLite
-=SELECT= statement provides all features of the =SELECT= statement in SQL
-standard.
+{{{heading(SELECT)}}}
 
-*** Simple uses of =SELECT= statement
+The =SELECT= statement is the most commonly used statement in SQL.  The SQLite
+=SELECT= statement provides all of the features of the =SELECT= statement in
+the SQL standard.
+
+*** Simple uses of the =SELECT= statement
 You can use the =SELECT= statement to perform a simple calculation as follows:
 
 #+begin_src sql
@@ -1019,6 +1022,9 @@ SELECT
 We often use the =SELECT= statement to query data from one or more table.  The
 syntax of the =SELECT= statement is as follows:
 
+{{{heading(SELECT Syntax)}}}
+#+cindex:@command{SELECT} syntax
+
 #+begin_src sql
 SELECT DISTINCT column_list
 FROM table_list
@@ -1030,9 +1036,9 @@ GROUP BY column
 HAVING group_filter;
 #+end_src
 
-The =SELECT= statement is the most complex statement in SQLite.  To help easier
-to understand each part, we will break the =SELECT= statement into multiple
-easy-to-understand tutorials.
+The =SELECT= statement is the most complex statement in SQLite.  To help make
+it easier to understand each part, we will break the =SELECT= statement into
+multiple easy-to-understand tutorials.
 
 #+cindex:@command{ORDER BY} clause
 #+cindex:sort result set
@@ -1068,6 +1074,8 @@ easy-to-understand tutorials.
 - Use =HAVING= clause to filter groups
 
 
+{{{subheading(SELECT <column-list> FROM <table-list>)}}}
+
 #+cindex:query data from single table
 #+cindex:@command{FROM} clause, with @command{SELECT} clause
 In this tutorial, we are going to focus on the simplest form of the =SELECT=
@@ -1097,11 +1105,11 @@ You use the semicolon (=;=) to terminate the statement.
 *** SQLite =SELECT= examples
 Let’s take a look at the =tracks= table in the sample database.
 
-[[file:figs/tracks.png][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/tracks.png]]
+[[file:figs/tracks.png]]
 
 The =tracks= table contains columns and rows.  It looks like a spreadsheet.
 
-[[file:figs/Tracks-Table-data.jpg][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/Tracks-Table-data.jpg]]
+[[file:figs/Tracks-Table-data.jpg]]
 
 To get data from the tracks table such as =trackid=, =track name=, =composer=,
 and =unit price=, you use the following statement:
@@ -1120,7 +1128,7 @@ You specify a list column names, which you want to get data, in the =SELECT=
 clause and the tracks table in the =FROM= clause.  SQLite returns the following
 result:
 
-[[file:figs/Tracks-Table-partial-data.jpg][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/Tracks-Table-partial-data.jpg]]
+[[file:figs/Tracks-Table-partial-data.jpg]]
 
 To get data from all columns, you specify the columns of the =tracks= table in
 the =SELECT= clause as follows:
@@ -1140,7 +1148,7 @@ FROM
  tracks;
 #+end_src
 
-For a table with many columns, the query would be so long that time-consuming
+For a table with many columns, the query would be too long and time-consuming
 to type.  To avoid this, you can use the asterisk (=*=), which is the shorthand
 for all columns of the table as follows:
 
@@ -1184,12 +1192,14 @@ So try to avoid using the asterisk (=*=) as a good habit when you use the
 
 #+cindex:@command{ORDER BY} clause
 #+cindex:sort result set, @command{ORDER BY}
-*Summary*: in this tutorial, you will learn how to sort the result set using
-SQLite =ORDER BY= clause.
+- *Summary* :: in this tutorial, you will learn how to sort the result set
+               using SQLite =ORDER BY= clause.
 
 *** Introduction to SQLite =ORDER BY= clause
 SQLite stores rows in a table in an unspecified order.  It means that the rows
 in the table may or may not be in the order that they were inserted.
+
+{{{heading(ORDER BY)}}}
 
 If you use the =SELECT= statement to query data from a table, the order of rows
 in the result set is unspecified.  To sort the result set, you add the =ORDER
@@ -1204,6 +1214,8 @@ ORDER BY
  column_1 ASC,
  column_2 DESC;
 #+end_src
+
+{{{subheading(after FROM clause)}}}
 
 The =ORDER BY= clause comes after the =FROM= clause.  The =ORDER BY= clause
 allows you to sort the result set based on one or more columns in different
@@ -1232,14 +1244,14 @@ You can sort the result set using a column that does not appear in the column
 list of the =SELECT= clause.
 
 #+cindex:@code{NULL} value
-SQLite processes =NULL= value differently.  A row with a =NULL value is higher
+SQLite processes =NULL= value differently.  A row with a =NULL= value is higher
 than rows with regular values in ascending order, and it is reversed for
 descending order.
 
 *** SQLite =ORDER BY= clause example
 Let’s take the =tracks= table in the sample database for the demonstration.
 
-[[file:figs/tracks.png][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/tracks.png]]
+[[file:figs/tracks.png]]
 
 Suppose, you want to get data from =name=, =milliseconds=, and =album id=
 columns, you use the following statement:
@@ -1253,7 +1265,7 @@ FROM
  tracks;
 #+end_src
 
-[[file:figs/tracks-table-data-without-sorting.jpg][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/tracks-table-data-without-sorting.jpg]]
+[[file:figs/tracks-table-data-without-sorting.jpg]]
 
 The =SELECT= statement that does not use =ORDER BY= clause returns a result set
 that is not in any order.
@@ -1272,7 +1284,7 @@ ORDER BY
  albumid ASC;
 #+end_src
 
-[[file:figs/SQLite-ORDER-BY-example.jpg][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/SQLite-ORDER-BY-example.jpg]]
+[[file:figs/SQLite-ORDER-BY-example.jpg]]
 
 The result set now is sorted by the =AlbumId= column in ascending order as
 shown in the screenshot.
@@ -1307,7 +1319,7 @@ ORDER BY
  milliseconds DESC;
 #+end_src
 
-[[file:figs/SQLite-ORDER-BY-multiple-columns-example.jpg][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/SQLite-ORDER-BY-multiple-columns-example.jpg]]
+[[file:figs/SQLite-ORDER-BY-multiple-columns-example.jpg]]
 
 SQLite sorts rows by =AlbumId= column in ascending order first.  Then, it sorts
 the sorted result set by the =Milliseconds= column in descending order.
@@ -1337,7 +1349,7 @@ ORDER BY
 The number 3 and 2 refers to the =AlbumId= and =Milliseconds= in the column
 list that appears in the =SELECT= clause.
 
-[[file:figs/SQLite-ORDER-BY-multiple-columns-by-positions.jpg][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/SQLite-ORDER-BY-multiple-columns-by-positions.jpg]]
+[[file:figs/SQLite-ORDER-BY-multiple-columns-by-positions.jpg]]
 
 ** Filtering data
 *** SQLite Select Distinct
@@ -1346,12 +1358,14 @@ list that appears in the =SELECT= clause.
 - query unique rows from a table using the [[http://www.sqlitetutorial.net/sqlite-select-distinct][=DISTINCT=]] clause.
 
 #+cindex:@code{SELECT DISTINCT} clause
-*Summary*: in this tutorial, you will learn how to use the SQLite =SELECT
-DISTINCT= clause to remove duplicate rows in the result set.
+- *Summary* :: in this tutorial, you will learn how to use the SQLite =SELECT
+               DISTINCT= clause to remove duplicate rows in the result set.
 
 **** Introduction to SQLite =SELECT DISTINCT= clause
 The =DISTINCT= clause is an optional clause of the =SELECT= statement.  The
 =DISTINCT= clause allows you to remove the duplicate rows in the result set.
+
+{{{heading(DISTINCT: remove duplicates)}}}
 
 The following statement illustrates the syntax of the DISTINCT clause:
 
@@ -1388,7 +1402,7 @@ ORDER BY
  country;
 #+end_src
 
-[[file:figs/SQLite-DISTINCT-multiple-columns.jpg][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/SQLite-DISTINCT-multiple-columns.jpg]]
+[[file:figs/SQLite-DISTINCT-multiple-columns.jpg]]
 
 The result set contains duplicate city and country e.g., Sao Paulo in Brazil as
 shown in the screenshot above.
@@ -1433,7 +1447,7 @@ FROM
  customers;
 #+end_src
 
-[[file:figs/SQLite-SELECT-with-DISTINCT-NULL-values.jpg][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/SQLite-SELECT-with-DISTINCT-NULL-values.jpg]]
+[[file:figs/SQLite-SELECT-with-DISTINCT-NULL-values.jpg]]
 
 The statement returns 11 rows with one =NULL= value.
 
@@ -1443,13 +1457,16 @@ The statement returns 11 rows with one =NULL= value.
 - filter rows of a result set using various conditions
 
 
-*Summary*: in this tutorial, you will learn how to use SQLite =WHERE= clause to
-specify the search condition for rows returned by the query.
+- *Summary* :: in this tutorial, you will learn how to use SQLite =WHERE=
+               clause to specify the search condition for rows returned by the
+               query.
 
 **** Introduction to SQLite =WHERE= clause
 #+cindex:@command{WHERE} clause
 The =WHERE= clause is an optional clause of the =SELECT= statement.  It appears
 after the =FROM= clause as the following statement:
+
+{{{heading(WHERE: filter data)}}}
 
 #+begin_src sql
 SELECT
@@ -1590,8 +1607,8 @@ WHERE
   helps you get the necessary data returned by a query.
 
 
-*Summary*: in this tutorial, you will learn how to use SQLite =LIMIT= clause to
-constrain the number of rows returned by a query.
+- *Summary* :: in this tutorial, you will learn how to use SQLite =LIMIT=
+               clause to constrain the number of rows returned by a query.
 
 **** Introduction to SQLite LIMIT clause
 #+cindex:@command{LIMIT} clause
@@ -1769,8 +1786,8 @@ LIMIT 1 OFFSET 2;
 - test whether a value is in a range of values
 
 
-*Summary*: in this tutorial, you will learn how to use the SQLite =BETWEEN=
-operator to test whether a value is in a range of values.
+- *Summary* :: in this tutorial, you will learn how to use the SQLite =BETWEEN=
+               operator to test whether a value is in a range of values.
 
 **** Introduction to SQLite =BETWEEN= Operator
 #+cindex:@command{BETWEEN} operator
@@ -1895,9 +1912,9 @@ ORDER BY
 
 #+cindex:@command{IN} operator
 #+cindex:match values
-*Summary*: in this tutorial, you will learn how to use the SQLite =IN= operator
-to determine whether a value matches any value in a list of values or a
-subquery.
+- *Summary* :: in this tutorial, you will learn how to use the SQLite =IN=
+               operator to determine whether a value matches any value in a
+               list of values or a subquery.
 
 **** Introduction to the SQLite =IN= operator
 The SQLite =IN= operator is used to determine whether a value matches any value
@@ -1920,7 +1937,7 @@ use the =NOT IN= operator.
 
 We will use the =tracks= table in the sample database for the demonstration.
 
-[[file:figs/tracks.png][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/tracks.png]]
+[[file:figs/tracks.png]]
 
 The following statement uses the =IN= operator to query the tracks whose media
 type id is 1 or 2.
@@ -1938,7 +1955,7 @@ ORDER BY
  name ASC;
 #+end_src
 
-[[file:figs/SQLite-IN-Operator.jpg][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/SQLite-IN-Operator.jpg]]
+[[file:figs/SQLite-IN-Operator.jpg]]
 
 
 #+cindex:@command{OR} operator
@@ -1994,7 +2011,7 @@ WHERE
  );
 #+end_src
 
-[[file:figs/SQLite-IN-subquery-example.jpg][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/SQLite-IN-subquery-example.jpg]]
+[[file:figs/SQLite-IN-subquery-example.jpg]]
 
 *** SQLite Like
 - http://www.sqlitetutorial.net/sqlite-like/
@@ -2003,8 +2020,8 @@ WHERE
   (=%=) and underscore (=_=)
 
 
-*Summary*: in this tutorial, you will learn how to query data based on pattern
-matching using SQLite LIKE operator.
+- *Summary* :: in this tutorial, you will learn how to query data based on
+               pattern matching using SQLite LIKE operator.
 
 **** Introduction to SQLite =LIKE= operator
 
@@ -2076,7 +2093,7 @@ escape character like the following expression:
 We use the =tracks= table in the sample database for the purpose of
 demonstration.
 
-[[file:figs/tracks.png][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/tracks.png]]
+[[file:figs/tracks.png]]
 
 To find the tracks whose names start with the =Wild= literal string, you use the
 percent sign =%= wildcard at the end of the pattern.
@@ -2091,7 +2108,7 @@ WHERE
  name LIKE 'Wild%'
 #+end_src
 
-[[file:figs/SQLite-LIKE-percentage-wildcard.png][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/SQLite-LIKE-percentage-wildcard.png]]
+[[file:figs/SQLite-LIKE-percentage-wildcard.png]]
 
 To find the tracks whose names end with =Wild= word, you use =%= wildcard at
 the beginning of the pattern.
@@ -2106,7 +2123,7 @@ WHERE
  name LIKE '%Wild'
 #+end_src
 
-[[file:figs/SQLite-LIKE-example.png][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/SQLite-LIKE-example.png]]
+[[file:figs/SQLite-LIKE-example.png]]
 
 To find the tracks whose names contain the =Wild= literal string, you use =%=
 wildcard at the beginning and end of the pattern:
@@ -2121,7 +2138,7 @@ WHERE
  name LIKE '%Wild%';
 #+end_src
 
-[[file:figs/SQLite-LIKE-wildcard-example.png][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/SQLite-LIKE-wildcard-example.png]]
+[[file:figs/SQLite-LIKE-wildcard-example.png]]
 
 The following statement finds the tracks whose names contain: zero or more
 characters (=%=), followed by =Br=, followed by a character (=_=), followed by
@@ -2143,8 +2160,9 @@ WHERE
 - determine whether a string matches a specific UNIX-pattern
 
 
-*Summary*: in this tutorial, you will learn how to use the SQLite GLOB operator
-to determine whether a string matches a specific pattern.
+- *Summary* :: in this tutorial, you will learn how to use the SQLite GLOB
+               operator to determine whether a string matches a specific
+               pattern.
 
 **** Introduction to the SQLite =GLOB= operator
 The =GLOB= operator is similar to the LIKE operator.  The =GLOB= operator
@@ -2285,8 +2303,8 @@ WHERE
      BY clause helps you summarize data for reporting purposes.
 
 
-*Summary*: in this tutorial, you will learn how to use SQLite GROUP BY clause
-to make a set of summary rows from a set of rows.
+- *Summary* :: in this tutorial, you will learn how to use SQLite GROUP BY
+               clause to make a set of summary rows from a set of rows.
 
 **** Introduction to SQLite GROUP BY clause
 #+cindex:@command{GROUP BY} clause
@@ -2331,8 +2349,8 @@ columns used to specify the group.
 
 
 
-*Summary*: in this tutorial, you will learn how to use SQLite HAVING clause to
-specify a filter condition for a group or an aggregate.
+- *Summary* :: in this tutorial, you will learn how to use SQLite HAVING clause
+               to specify a filter condition for a group or an aggregate.
 
 **** Introduction to SQLite =HAVING= clause
 #+cindex:@command{HAVING} clause
@@ -2458,8 +2476,8 @@ and delete statements.
                    insert rows into a table
 
 
-*Summary*: in this tutorial, you will learn how to use SQLite =INSERT=
-statement to insert new rows into a table.
+- *Summary* :: in this tutorial, you will learn how to use SQLite =INSERT=
+               statement to insert new rows into a table.
 
 To insert data into a table, you use the =INSERT= statement.  SQLite provides
 various forms of the =INSERT= statements that allow you to insert a single row,
@@ -2645,8 +2663,8 @@ FROM
       update existing rows in a table.
 
 
-*Summary*: in this tutorial, you will learn how to use SQLite =UPDATE=
-statement to update data of existing rows in the table.
+- *Summary* :: in this tutorial, you will learn how to use SQLite
+               =UPDATE=statement to update data of existing rows in the table.
 
 **** Introduction to SQLite =UPDATE= statement
 #+cindex:@command{UPDATE} statement
@@ -2824,8 +2842,8 @@ SET email = lower(
                    delete rows from a table.
 
 
-*Summary*: this tutorial shows you how to use SQLite DELETE statement to remove
-rows from a table.
+- *Summary* :: this tutorial shows you how to use SQLite DELETE statement to
+               remove rows from a table.
 
 **** Introduction to SQLite =DELETE= statement
 #+cindex:@command{DELETE} statement
@@ -2938,8 +2956,9 @@ FROM
 
 
 #+cindex:@command{REPLACE()} function
-*Summary*: in this tutorial, you will learn how to use SQLite ~REPLACE()~
-function to replace all occurrences of a specified string with another string.
+- *Summary* :: in this tutorial, you will learn how to use SQLite ~REPLACE()~
+               function to replace all occurrences of a specified string with
+               another string.
 
 **** Introduction to SQLite ~REPLACE()~ function
 The SQLite ~REPLACE()~ function is a string function that allows you to replace
@@ -3044,8 +3063,8 @@ FROM
      show you how to handle transactions.
 
 
-*Summary*: in this tutorial, we will show you how to use the SQLite transaction
-to ensure the integrity and reliability of the data.
+- *Summary* :: in this tutorial, we will show you how to use the SQLite
+               transaction to ensure the integrity and reliability of the data.
 
 *** SQlite & ACID
 #+cindex:ACID
@@ -3200,9 +3219,9 @@ values(200,'+',1000,datetime('now'));
 COMMIT;
 #+end_src
 
-** Data Definition
+** Data Definitions
 In this section, we show you how to create database objects such as tables,
-views, indexes using SQL data definition language.
+views, and indexes using the SQL data definition language.
 
 *** SQLite Data Types
 - http://www.sqlitetutorial.net/sqlite-data-types/
@@ -3211,6 +3230,178 @@ views, indexes using SQL data definition language.
 
      introduce you to the SQLite dynamic types system and its important
      concepts: storage classes, manifest typing, and type affinity.
+
+- Summary :: in this tutorial, you will learn about the SQLite data types
+             system and related concepts such as storage classes, manifest
+             typing, and type affinity.
+
+**** Introduction to SQLite data types
+#+cindex:data types
+#+cindex:static typing
+#+cindex:MySQL
+#+cindex:PostgreSQL
+If you come from other database systems such as MySQL and PostgreSQL, you
+notice that they use *static typing*.  This means that when you declare a column
+with a specific data type, that column can store only data with the declared
+data type.
+
+#+cindex:dynamic typing
+Different from other database systems, SQLite uses a *dynamic type* system.
+For example, /the value stored in a column determines its data type/, not the
+column’s data type.
+
+In addition, you don’t have to declare a specific data type for a column when
+you create a table.  Even in the case when you declare a column with the
+=integer= data type, you can store any kind of data types such as text and
+=BLOB=, and SQLite will not complain.
+
+{{{heading(Storage Classes vs. Data Types)}}}
+
+#+cindex:storage classes
+#+cindex:primitive data types
+SQLite provides five primitive data types which referred to as /storage
+classes/.
+
+The concept of /storage classes/ describes the format SQLite uses to store data
+on disk.  A storage class is more general than a data type e.g., =INTEGER=
+storage class includes 6 different types of integers.  In most cases, you can
+use storage classes and data type interchangeably.
+
+The following table illustrates 5 storage classes in SQLite:
+
+| Storage Class | Meaning                                                                                                                           |
+|---------------+-----------------------------------------------------------------------------------------------------------------------------------|
+| NULL          | NULL values mean missing information or unknown.                                                                                  |
+| INTEGER       | Integer values are whole numbers (either positive or negative). An integer can have variable sizes such as 1, 2,3, 4, or 8 bytes. |
+| REAL          | Real values are real numbers with decimal values that use 8-byte floats.                                                          |
+| TEXT          | TEXT is used to store character data. The maximum length of TEXT is unlimited. SQLite supports various character encodings.       |
+| BLOB          | BLOB stands for a binary large object that can be used to store any kind of data. The maximum size of BLOBs is unlimited.         |
+|---------------+-----------------------------------------------------------------------------------------------------------------------------------|
+
+Based on the format of a value, SQLite determines its data type based on the
+following rules:
+
+- If a literal has no enclosing quotes and decimal point or exponent, SQLite
+  assigns the INTEGER storage class.
+
+- If a literal is enclosed by single or double quotes, SQLite assigns the TEXT
+  storage class.
+
+- If a literal is NULL without quotes, it assigns the NULL storage class.
+
+- If a literal has the X’ABCD’ or x ‘abcd’, SQLite assigns the BLOB storage
+  class.
+
+
+{{{heading(No DATE or TIME Storage Classes)}}}
+
+SQLite does not support built-in date and time storage classes. However, you
+can use the TEXT, INT, or REAL to store date and time values.  For detailed
+information on how to handle date and time values, check it out the [[http://www.sqlitetutorial.net/sqlite-date/][SQLite date
+and time tutorial]].
+
+{{{heading(TYPEOF() Function)}}}
+
+SQLites provides the ~typeof()~ function that allows you to check the storage
+class of a value based on its format.  See the following statement:
+
+#+begin_src sql
+SELECT
+ typeof(100),
+ typeof(10.0),
+ typeof('100'),
+ typeof(x'1000'),
+ typeof(NULL);
+#+end_src
+
+
+{{{heading(Mixed Data Types)}}}
+
+
+A single column in SQLite can store mixed data types.  See the following
+example.
+
+First, we create a new table named =test_datatypes= for testing.
+
+#+begin_src sql
+CREATE TABLE test_datatypes (
+ id INTEGER PRIMARY KEY,
+ val
+);
+#+end_src
+
+Second, we insert data into the =test_datatypes= table.
+
+#+begin_src sql
+INSERT INTO test_datatypes (val)
+VALUES
+ (1),
+ (2),
+ (10.1),
+ (20.5),
+ ('A'),
+ ('B'),
+ (NULL),
+ (x'0010'),
+ (x'0011');
+#+end_src
+
+Third, we use the ~typeof()~ function to get the data type of each value stored
+in the =val= column.
+
+#+begin_src sql
+SELECT
+ id,
+ val,
+ typeof(val)
+FROM
+ test_datatypes;
+#+end_src
+
+{{{subheading(Sorting Columns of Mixed Data Types)}}}
+
+You may ask how SQLite sorts data in a column with different storage classes
+like =val= column above.
+
+To resolve this, SQLite provides a set of rules when it comes to sorting.
+
+- =NULL= storage class has the lowest value.  It less than any other value.
+  Between =NULL= values, there is no order.
+
+- The next higher storage classes are =INTEGER= and =REAL=.  SQLite compares
+  =INTEGER= and =REAL= numerically.
+
+- The next higher storage class is =TEXT=.  SQLite uses the collation of =TEXT=
+  values when it compares the =TEXT= values.
+
+- The highest storage class is the =BLOB=.  SQLite uses C ~memcmp()~ function
+  to compare =BLOB= values.
+
+
+When you use the =ORDER BY= clause to sort the data in a column with different
+storage classes, SQLite performs the following steps:
+
+- First, group values based on storage class: =NULL=, =INTEGER=, and =REAL=,
+  =TEXT=, and =BLOB=.
+
+- Second, sort the values in each group.
+
+
+**** SQLite Manifest Typing and Type Affinity
+Other important concepts related to SQLite data types are /manifest typing/ and
+/type affinity/.
+
+#+cindex:manifest typing
+Manifest typing means two things:
+
+- First, a column can have an associated data type.
+- Second, the data type of the column can be inferred from values it stores.
+
+
+#+cindex:type affinity
+Type affinity of a column is the recommended type of data that a column stores.
+It is only recommended, not required, and so therefore a column can store any
+type of data.
 
 
 *** SQLite =CREATE TABLE=
@@ -3294,8 +3485,8 @@ views, indexes using SQL data definition language.
      in the database.
 
 
-*Summary*: in this tutorial, you will learn how to use the SQLite =CREATE VIEW=
-statement to create a view.
+- *Summary* :: in this tutorial, you will learn how to use the SQLite =CREATE
+               VIEW= statement to create a view.
 
 *** What is a view
 #+cindex:view definition
@@ -3424,8 +3615,9 @@ database:
                   up your queries.
 
 
-*Summary*: in this tutorial, you will learn how to use SQLite indexes to query
-data faster, speed up sort operation, and enforce unique constraints.
+- *Summary* :: in this tutorial, you will learn how to use SQLite indexes to
+               query data faster, speed up sort operation, and enforce unique
+               constraints.
 
 **** What is an Index
 #+cindex:table, definition
@@ -3439,7 +3631,7 @@ Unlike a table, an index has an opposite relationship: =(row, rowid)=.  An
 /index/ is an additional data structure that helps speed up querying, join, and
 grouping operations.
 
-[[file:figs/SQLite-Index.png][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/SQLite-Index.png]]
+[[file:figs/SQLite-Index.png]]
 
 #+cindex:B-tree index
 SQLite uses B-tree index.  =B= stands for /balanced/.  The B-tree keeps the
@@ -3677,8 +3869,8 @@ The =idx_contacts_name= index is removed completely from the disk.
      show you the most commonly used command in sqlite3 program.
 
 
-*Summary*: in this tutorial, we will introduce you to the most commonly used
-SQLite commands of the ~sqlite3~ command line program.
+- *Summary* :: in this tutorial, we will introduce you to the most commonly
+               used SQLite commands of the ~sqlite3~ command line program.
 
 The SQLite project delivers a simple command-line tool named ~sqlite3~ (or
 sqlite3.exe on Windows) that allows you to interact with the SQLite databases
@@ -3932,9 +4124,9 @@ sqlite> .read c:/sqlite/commands.txt
      list all tables in a database.
 
 
-*Summary*: in this tutorial, you will learn various ways to show tables from an
-SQLite database by using SQLite command line shell program or by querying data
-from =sqlite_master= tables.
+- *Summary* :: in this tutorial, you will learn various ways to show tables
+               from an SQLite database by using SQLite command line shell
+               program or by querying data from =sqlite_master= tables.
 
 **** Showing tables using the sqlite command line shell program
 To show tables in a database using the ~sqlite3~ command line shell program,
@@ -4040,8 +4232,8 @@ system tables managed internally by SQLite.
      show the structure of a table.
 
 
-*Summary*: in this tutorial, you will learn about various ways to show the
-structure of a table in SQLite.
+- *Summary* :: in this tutorial, you will learn about various ways to show the
+               structure of a table in SQLite.
 
 **** Getting the structure of a table via the SQLite command line shell program
 To find out the structure of a table via SQLite command line shell program, you
@@ -4121,20 +4313,23 @@ CREATE TABLE "albums"
 
 - SQLite Dump ::
 
-                 how to use dump command to backup and restore a database.
+                 how to use the ~.dump~ command to backup and restore a
+                 database.
 
+- *Summary* :: in this tutorial, you will learn how to use the SQLite dump
+               command to backup and restore a database.
 
-*Summary*: in this tutorial, you will learn how to use the SQLite dump command
-to backup and restore a database.
+The SQLite project delivers the ~sqlite3~ tool that allows you to interact with
+the SQLite database using a command-line shell program.
 
-SQLite project delivers the ~sqlite3~ tool that allows you to interact with the
-SQLite database using command-line shell program.
-
+#+cindex:dot-commands
 By using the ~sqlite3~ tool, you can use the SQL statements to query or update
 data in the database.  In addition, you can use special commands, which are
-known as dot-commands to perform various useful database operations.
+known as /dot-commands/ to perform various useful database operations.
 
 #+cindex:@command{.dump} command
+#+cindex:backup a database
+#+cindex:dump database into text file
 One of these dot-commands is the ~.dump~ command that gives you the ability to
 dump the entire database or tables into a text file.
 
@@ -4148,6 +4343,8 @@ SQLite version 3.13.0 2016-05-18 10:57:30
 Enter ".help" for usage hints.
 sqlite>
 #+end_src
+
+{{{heading(.output <file> ... .dump)}}}
 
 To dump a database into a file, you use the ~.dump~ command.  The ~.dump~
 command converts the entire structure and data of an SQLite database into a
@@ -4179,7 +4376,7 @@ sqlite> .quit
 
 The following picture shows the content of the ~albums.sql~ file.
 
-[[file:figs/SQLite-dump-example.png][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/SQLite-dump-example.png]]
+[[file:figs/SQLite-dump-example.png]]
 
 **** Dump tables structure only using schema command
 If you want to dump the structures of tables in a database, you use the
@@ -4195,7 +4392,7 @@ sqlite> .quit
 
 The following picture shows the content of the =chinook_structure.sql= file.
 
-[[file:figs/SQLite-dump-structure.png][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/SQLite-dump-structure.png]]
+[[file:figs/SQLite-dump-structure.png]]
 
 **** Dump data of one or more tables into a file
 To dump the data of a table into a text file, you use these steps:
@@ -4222,7 +4419,7 @@ to dump.  The following command returns data from the =artists= table.
 Check the content of the ~data.sql~ file; if everything is fine, you will see
 the following output:
 
-[[file:figs/SQLite-dump-data-only.png][file:/usr/local/dev/programming/DB/SQLite/SQLiteTutorial/figs/SQLite-dump-data-only.png]]
+[[file:figs/SQLite-dump-data-only.png]]
 
 To dump data from other tables, you need to issue the =SELECT= statements to
 query data from those tables.
@@ -4235,26 +4432,28 @@ query data from those tables.
      how to import CSV file into a table.
 
 
-*Summary*: this tutorial shows you various ways to import CSV data into an
-SQLite table using ~sqlite3~ and SQLite Studio tools.
+- *Summary* :: this tutorial shows you various ways to import CSV data into an
+               SQLite table using ~sqlite3~ and SQLite Studio tools.
 
 **** Importing a CSV file into a table using ~sqlite3~ tool
-In the first scenario, you want to import data from CSV file into a table that
-does not exist in the SQLite database.
+In the first scenario, you want to import data from a CSV file into a table
+that does not exist in the SQLite database.
 
 1. First, the ~sqlite3~ tool creates the table.  The ~sqlite3~ tool uses the
    first row of the CSV file as the names of the columns of the table.
 
-2. Second, the ~sqlite3~ tool imports data from the second row of the CSV file
-   into the table.
+2. Second, the ~sqlite3~ tool imports data from the second row onward of the
+   CSV file into the table.
 
 
-We will import a CSV file named ~city.csv~ with two columns: name and
-population.  You can download it here for practicing.
+We will import a CSV file named ~city.csv~ with two columns: =name= and
+=population=.  You can download it here for practicing.
 
 [[http://www.sqlitetutorial.net/wp-content/uploads/2016/05/city.csv][Download the city.csv file]]
 
 To import the ~c:\sqlite\city.csv~ file into the =cities= table:
+
+{{{heading(.mode CSV)}}}
 
 #+cindex:CSV mode
 #+cindex:mode, CSV
@@ -4263,6 +4462,8 @@ interpret the input file as a CSV file.  To do this, you use the ~.mode~
 command as follows:
 
 : sqlite> .mode csv
+
+{{{heading(.import <file> <table>)}}}
 
 #+cindex:@command{.import FILE TABLE} command
 Second, use the ~.import FILE TABLE~ command to import the data from the
@@ -4326,8 +4527,8 @@ sqlite> .import c:/sqlite/city_no_header.csv cities
      how to export an SQLite database to CSV files.
 
 
-*Summary*: in this tutorial, you will learn how to export SQLite database to a
-CSV file.
+- *Summary* :: in this tutorial, you will learn how to export SQLite database
+               to a CSV file.
 
 **** Export SQLite Database to a CSV file using sqlite3 tool
 SQLite project provides you with a command-line program called ~sqlite3~ or
@@ -4390,9 +4591,10 @@ you can execute the statements in the file and export data to a CSV file.
 This tutorial shows you how to use the SQLite aggregate functions to find the
 maximum, minimum, average, sum, and count of a set of values.
 
-*Summary*: in this tutorial, you will learn about the SQLite aggregate
-functions to find the maximum, minimum, average, sum, and count of a set of
-values.
+- *Summary* :: in this tutorial, you will learn about the SQLite aggregate
+               functions to find the maximum, minimum, average, sum, and count
+               of a set of values.
+
 *** Overview of SQLite aggregate functions
 Aggregate functions operate on a set of rows and return a single result.
 Aggregate functions are often used in conjunction with =GROUP BY= and =HAVING=
