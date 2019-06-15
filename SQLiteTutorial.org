@@ -1,8 +1,8 @@
 # -*- mode:org; fill-column:79; -*-
 #+title:SQLite Tutorial
 #+subtitle:{{{version}}}
-#+date:2019-06-15 07:40
-#+macro:version Version 0.0.14 {{{date}}}
+#+date:2019-06-15 08:33
+#+macro:version Version 0.0.15 {{{date}}}
 * Introduction
 - [[https://www.sqlite.org/index.html][SQLite Home]]
 - [[https://www.sqlite.org/docs.html][SQLite Documentation]]
@@ -4687,6 +4687,8 @@ to the SQLite database, and performing the common database operations.
 - http://www.sqlitetutorial.net/sqlite-nodejs/
 
 
+#+cindex:Node.js applications
+#+cindex:@code{sqlite3} module
 This section shows you how to interact with SQLite databases from Node.js
 applications using the node sqlite3 module.
 
@@ -4696,6 +4698,7 @@ know how to open a database connection and perform common database operations
 such as select, insert, update, and delete.  In addition, you will learn how to
 execute SQL statements in serialized mode or in parallel mode.
 
+#+cindex:@command{sqlite3} features
 The ~sqlite3~ module is actively maintained and provides a rich set of
 features:
 
@@ -4712,8 +4715,9 @@ features:
 To understand how the ~sqlite3~ module works, you can use the following
 tutorials in sequence:
 
-*** Connecting To SQLite Database Using Node.js
+*** Connect To an SQLite Database Using Node.js
 - http://www.sqlitetutorial.net/sqlite-nodejs/connect/
+
 
 - Summary :: in this tutorial, you will learn how to connect to an SQLite
              database from Node.js applications.
@@ -4721,7 +4725,7 @@ tutorials in sequence:
 
 **** Installing sqlite3 module
 #+cindex:@command{sqlite3} module, Node.js
-#+cindex:Node.js @command{sqlite3} module
+#+cindex:Node.js @command{sqlite3} module, install
 #+cindex:@command{npm install}
 To interact with the SQLite database, you need to download and install the
 ~sqlite3~ module.  You can use ~npm~ to do so using the following command:
@@ -4861,6 +4865,7 @@ Done in 8.76s.
 
 {{{heading(Connect to a Database using ~sqlite3~ Module)}}}
 
+#+cindex:@command{sqlite3} connect to db
 After installing the ~sqlite3~ module, you are ready to connect to a SQLite
 database from a Node.js application.
 
@@ -4869,6 +4874,8 @@ To connect to an SQLite database, you need to:
 1. First, import the ~sqlite3~ module
 
    #+cindex:@code{Database()} function
+   #+cindex:database information
+   #+cindex:mode, opening
 2. Second, call the ~Database()~ function of the ~sqlite3~ module and pass the
    database information such as database file, opening mode, and a callback
    function.
@@ -4881,7 +4888,7 @@ First, import the ~sqlite3~ module:
 
 : const sqlite3 = require('sqlite3').verbose();
 
-#+cindex:execution mode verbose
+#+cindex:execution mode, verbose
 #+cindex:verbose execution mode
 Notice that the /execution mode/ is set to verbose to produce long stack
 traces.
@@ -4955,7 +4962,7 @@ db.close((err) => {
 
 **** JS Code for Opening and Closing an In-Memory Database
 
-#+caption:Open and close an in-memory SQLite database
+#+caption[In-memory database]:Open and close an in-memory SQLite database
 #+name:connect.js
 #+begin_src js :tangle src/connect.js :mkdirp yes
 const sqlite3 = require('sqlite3').verbose();
@@ -4994,6 +5001,7 @@ node connect.js
 As you can see, it works perfectly as expected.
 
 **** Connecting to a Disk File Database
+#+cindex:@command{sqlite3} connect
 To connect to a disk file database, instead of passing the =':memory:'= string,
 you pass the path to the database file.
 
@@ -5001,7 +5009,7 @@ For example, to connect to the =chinook= database file stored in the ~db/~
 folder, you use the following statement:
 
 #+begin_src js
-let db = new sqlite3.Database('./db/chinook.db', (err) => {
+let db = new sqlite3.Database('../db/chinook.db', (err) => {
   if (err) {
     console.error(err.message);
   }
@@ -5012,18 +5020,22 @@ let db = new sqlite3.Database('./db/chinook.db', (err) => {
 {{{heading(Opening Modes)}}}
 
 #+cindex:opening modes
+#+cindex:modes, opening
 There are three opening modes:
 
+#+cindex:@code{OPEN_READONLY} mode
 1. =sqlite3.OPEN_READONLY=: open the database for read-only.
 
+   #+cindex:@code{OPEN_READWRITE} mode
 2. =sqlite3.OPEN_READWRITE= : open the database for reading and writing.
 
+   #+cindex:@code{OPEN_CREATE} mode
 3. =sqlite3.OPEN_CREATE=: open the database, if the database does not exist,
    create a new database.
 
 
 The ~sqlite3.Database()~ accepts one or more modes as the second argument.  By
-default, it uses the =OPEN_READWRITE | OPEN_CREATE= modes.  this means that if
+default, it uses the =OPEN_READWRITE | OPEN_CREATE= modes.  This means that if
 the database does not exist, the new database will be created and is ready for
 reading and writing.
 
@@ -5031,7 +5043,7 @@ To open the =chinook= sample database for read and write, you can do it as
 follows:
 
 #+begin_src js
-let db = new sqlite3.Database('./db/chinook.db', sqlite3.OPEN_READWRITE, (err) => {
+let db = new sqlite3.Database('../db/chinook.db', sqlite3.OPEN_READWRITE, (err) => {
   if (err) {
     console.error(err.message);
   }
@@ -5044,7 +5056,7 @@ The following example shows the complete code for opening the =chinook=
 database, querying data from the playlists =table=, and closing the database
 connection.
 
-#+caption:Open, query, and close the Chinook database
+#+caption[Open-Close Database]:Open, query, and close the Chinook database
 #+name:chinook.js
 #+begin_src js :tangle src/chinook.js :mkdirp yes
 const sqlite3 = require('sqlite3').verbose();
@@ -5107,10 +5119,12 @@ Close the database connection.
 *** Querying Data in SQLite Database from Node.js Applications
 - http://www.sqlitetutorial.net/sqlite-nodejs/query/
 
+
 - Summary :: in this tutorial, you will learn how to query data from the SQLite
              database from a Node.js application using sqlite3 API.
 
 
+#+cindex:query data, @command{sqlite3} module
 To query data in SQLite database from a Node.js application, you use these
 steps:
 
@@ -5121,33 +5135,43 @@ steps:
 3. Close the database connection.
 
 
+#+cindex:@code{all()} method
+#+cindex:@code{each()} method
+#+cindex:@code{get()} method
 The ~sqlite3~ module provides you with some methods for querying data such as
 ~all()~, ~each()~ and ~get()~.
 
 **** Querying all rows with ~all()~ method
+#+cindex:@code{all()} method
 The ~all()~ method allows you to execute an SQL query with specified parameters
 and call a callback to access the rows in the result set.
 
+#+cindex:@code{all()} method signature
+#+cindex:signature, @code{all()} method
 The following is the signature of the ~all()~ method:
 
 #+begin_src js
-db.all(sql,params,(err, rows ) => {
+db.all(sql, params, (err, rows) => {
     // process rows here
 });
 #+end_src
 
-The ~err~ argument stores the error detail in case there was an error occurred
+The ~err~ argument stores the error detail in case there an error occurred
 during the execution of the query.  Otherwise, the ~err~ will be =NULL=.  If
 the query is executed successfully, the ~rows~ argument contains the result set
 of the query.
 
-Because the ~all()~ method retrieves all rows and places them in the memory,
-therefore, for the large result set, you should use the ~each()~ method.
+Because the ~all()~ method retrieves all rows and places them in memory, for
+the large result set you should use the ~each()~ method instead.
 
+{{{heading(How to query data using the ~all()~ method)}}}
+
+#+cindex:query data using @code{all()} method
+#+cindex:@code{all()} method, query data
 The following example illustrates how to query data from the =playlists= table
 in the sample database using the ~all()~ method:
 
-#+caption:Query Data using ~all()~ Method
+#+caption[Query all() Method]:Query Data using ~all()~ Method
 #+name:all.js
 #+begin_src js :tangle src/all.js :mkdirp yes
 const sqlite3 = require('sqlite3').verbose();
@@ -5199,6 +5223,8 @@ TV Shows
 The output shows all playlists as expected.
 
 **** Query the first row in the result set
+#+cindex:@code{get()} method
+#+cindex:query using @code{get()} method
 When you know that the result set contains zero or one row e.g., querying a row
 based on the primary key or querying with only one aggregate function such as
 ~count~, ~sum~, ~max~, ~min~, etc., you can use the ~get()~ method of the
@@ -5210,6 +5236,7 @@ db.get(sql, params, (err, row) => {
 });
 #+end_src
 
+#+cindex:@code{get()} method
 The ~get()~ method executes an SQL query and calls the callback function on the
 first result row.  In case the result set is empty, the row argument is
 =undefined=.
@@ -5217,7 +5244,7 @@ first result row.  In case the result set is empty, the row argument is
 The following ~get.js~ program demonstrates how to query a playlist by its
 =id=:
 
-#+caption:Query a playlist by its ~id~
+#+caption[Query all()]:Query a playlist by its ~id~
 #+name:get.js
 #+begin_src js :tangle src/get.js :mkdirp yes
 const sqlite3 = require('sqlite3').verbose();
@@ -5272,9 +5299,13 @@ node get0.js
 It shows that no playlist found with =id= 0 as expected.
 
 **** Query rows with ~each()~ method
+#+cindex:@code{each()} method
+#+cindex:query using @code{each()} method
 The ~each()~ method executes an SQL query with specified parameters and calls a
 callback for every row in the result set.
 
+#+cindex:@code{each()} method signature
+#+cindex:signature of @code{each()} method
 The following illustrates the signature of the ~each()~ method:
 
 #+begin_src js
@@ -5289,7 +5320,7 @@ error, the ~err~ parameter contains the detailed information.
 The following ~each.js~ program illustrates how to use the ~each()~ method to
 query customer’s data from the =customers= table.
 
-#+caption:Query Data using the ~each()~ method
+#+caption[Query each()]:Query Data using the ~each()~ method
 #+name:each.js
 #+begin_src js :tangle src/each.js :mkdirp yes
 const sqlite3 = require('sqlite3').verbose();
@@ -5347,10 +5378,14 @@ customer’s information.
 *** Controlling the Execution Flow of Statements
 - http://www.sqlitetutorial.net/sqlite-nodejs/statements-control-flow/
 
+
 - Summary :: in this tutorial, you will learn how to control the execution flow
              of statements.
 
 
+#+cindex:execution flow, @command{sqlite3}
+#+cindex:@code{serialize()} method, execution flow
+#+cindex:@code{parallelize()} method, execution flow
 The ~sqlite3~ module provides you with two methods for controlling the
 execution flow of statements.  The ~serialize()~ method allows you to execute
 statements in serialized mode, while the ~parallelize()~ method executes the
@@ -5359,14 +5394,20 @@ statements in parallel.
 Let’s look into each method in detail to understand how it works.
 
 **** Executing statement in serialized mode with ~Database.serialize~
-The ~serialize()~ method puts the execution mode into serialized mode.  It
-means that only one statement can execute at a time.  Other statements will
+#+cindex:@code{serialize()} method
+#+cindex:mode, serialized
+#+cindex:serialized mode
+#+cindex:execution mode, serialized
+#+cindex:mode, execution, serialized
+The ~serialize()~ method puts the execution mode into *serialized mode*.  It
+means that /only one statement can execute at a time/.  Other statements will
 wait in a queue until all the previous statements are executed.
 
 After the ~serialize()~ method returns, the execution mode is set to the
 original mode again.
 
-It’s safe to nest the ~serialize()~ method as follows:
+#+cindex:nest @code{serialize()} methods
+It’s safe to nest the ~serialize()~ methods as follows:
 
 #+begin_src js
 db.serialize(() => {
@@ -5389,7 +5430,7 @@ Suppose, you want to execute the following three statements in sequence:
 
 To do this, you place these statements in the ~serialize()~ method as follows:
 
-#+caption:Running Queries in ~serialize~ mode
+#+caption[Serialize mode]:Running Queries in ~serialize~ mode
 #+name:serialize.js
 #+begin_src js :tangle src/serialize.js :mkdirp yes
 const sqlite3 = require('sqlite3').verbose();
@@ -5424,8 +5465,9 @@ db.close((err) => {
 });
 #+end_src
 
-Because the ~run()~ method returns a =Database= object so that we could chain
-the method calls.
+#+cindex:chain method calls, @code{Database} object
+Because the ~run()~ method returns a =Database= object, we can chain the method
+calls.
 
 Let’s run the program to see how it works.
 
@@ -5442,9 +5484,11 @@ node serialize.js
 It works as expected.
 
 Notice that if you don’t place three statements in the ~serialize()~ method,
-all the three statements may execute in parallel which would cause an error.
+the three statements may execute in parallel, which would cause an error.
 
 **** Executing statements in parallel with ~Database.parallelize~
+#+cindex:@code{parallelize()} method
+#+cindex:parallelize mode
 If you want the scheduled queries to execute in parallel, you place them in the
 ~parallelize()~ method.
 
@@ -5465,7 +5509,7 @@ For the demonstration, we will create a new function that calculates the sum of
 two numbers using SQLite database and place the function calls in the
 ~parallelize()~ method as shown in the following example:
 
-#+caption:Run function calls in parallel using ~parallelize~ mode
+#+caption[Parallelize mode]:Run function calls in parallel using ~parallelize~ mode
 #+name:parallelize.js
 #+begin_src js :tangle src/parallelize.js :mkdirp yes
 const sqlite3 = require('sqlite3').verbose();
@@ -5531,6 +5575,7 @@ on this machine.]
              into an SQLite table from a Node.js application.
 
 
+#+cindex:insert data
 To insert data into an SQLite table from a Node.js application, you follow
 these steps:
 
@@ -5546,6 +5591,7 @@ For the demonstration, we will create a new database named ~sample.db~ in the
 
 {{{heading(Open a Database Connection)}}}
 
+#+cindex:default mode, open database
 When you open a database connection in the =default= mode, the database is
 created if it does not exist.
 
@@ -5559,7 +5605,7 @@ programming languages:
 You can run the program to create the ~sample.db~ database and =langs= table as
 follows:
 
-#+caption:Create the ~sample.db~ database and =langs= Table
+#+caption[Create new database]:Create the ~sample.db~ database and =langs= Table
 #+name:sample.js
 #+begin_src js :tangle src/sample.js :mkdirp yes
 const sqlite3 = require('sqlite3').verbose();
@@ -5582,6 +5628,8 @@ Now, we are ready to insert data into the =langs= table.
 
 {{{heading(Insert one row into a table)}}}
 
+#+cindex:@code{INSERT} statement using @code{run()} method
+#+cindex:@code{run()} method, @code{INSERT}
 To execute an =INSERT= statement, you use the ~run()~ method of the =Database=
 object:
 
@@ -5592,13 +5640,10 @@ db.run(sql, params, function(err){
 #+end_src
 
 The ~run()~ method executes an =INSERT= statement with specified parameters and
-calls a callback afterwards.
-
-If an error occurred, you can find the detailed information in the =err=
-argument of the callback function.
-
-In case the statement is executed successfully, the ~this~ object of the
-callback function will contain two properties:
+calls a callback afterwards.  If an error occurred, you can find the detailed
+information in the =err= argument of the callback function.  In case the
+statement is executed successfully, the ~this~ object of the callback function
+will contain two properties:
 
 - =lastID= property stores the value of the last inserted row ID.
 
@@ -5608,7 +5653,7 @@ callback function will contain two properties:
 The following ~insert.js~ program illustrates how to insert a row into the
 =langs= table:
 
-#+caption:Insert a row into the =langs= table
+#+caption[Insert row]:Insert a row into the =langs= table
 #+name:insert.js
 #+begin_src js :tangle src/insert.js :mkdirp yes
 const sqlite3 = require('sqlite3').verbose();
@@ -5642,6 +5687,8 @@ It worked as expected.
 
 {{{heading(Insert multiple rows into a table at a time)}}}
 
+#+cindex:insert multiple rows
+#+cindex:@code{INSERT} multiple rows
 To insert multiple rows at a time into a table, you use the following form of
 the =INSERT= statement:
 
@@ -5675,7 +5722,7 @@ let sql = 'INSERT INTO langs(name) VALUES ' + placeholders;
 The following ~insert-many.js~ program illustrates how to insert multiple rows
 into the =langs= table:
 
-#+caption:Insert multiple rows into the =langs= table
+#+caption[Insert multiple rows]:Insert multiple rows into the =langs= table
 #+name:insert-many.js
 #+begin_src js :tangle src/insert-many.js :mkdirp yes
 const sqlite3 = require('sqlite3').verbose();
@@ -5715,8 +5762,8 @@ node insert-many.js
 : INSERT INTO langs(name) VALUES (?),(?),(?),(?),(?)
 : Rows inserted 5
 
-
 It inserted 5 rows into the =langs= table, which is what we expected.
+
 *** Updating Data in SQLite Database from a Node.js Application
 - http://www.sqlitetutorial.net/sqlite-nodejs/update/
 
@@ -5725,6 +5772,8 @@ It inserted 5 rows into the =langs= table, which is what we expected.
              from a Node.js application.
 
 
+#+cindex:update data
+#+cindex:@code{UPDATE} statement
 To update data in the SQLite database from a Node.js application, you use these
 steps:
 
@@ -5740,6 +5789,7 @@ database that we created in the previous tutorial.
 
 {{{heading(Updating data example)}}}
 
+#+cindex:@code{UDPATE} syntax
 To update data in a table, you use the =UPDATE= statement as follows:
 
 #+begin_src sql
@@ -5767,7 +5817,7 @@ number of rows updated.
 The following ~update.js~ program illustrates how to update a row in the
 =langs= table from C to Ansi C:
 
-#+caption:How to update a row in the =langs= table
+#+caption[Update row]:How to update a row in the =langs= table
 #+name:update.js
 #+begin_src js :tangle src/update.js :mkdirp yes
 const sqlite3 = require('sqlite3').verbose();
@@ -5813,6 +5863,8 @@ The output showed that one row has been updated which is correct.
              database from a Node.js application.
 
 
+#+cindex:delete data
+#+cindex:@code{DELETE} statement
 To delete data in the SQLite database from a Node.js application, you use the
 following steps:
 
@@ -5828,6 +5880,7 @@ database that we created in the previous tutorial.
 
 {{{heading(Deleting data example)}}}
 
+#+cindex:@code{DELETE} syntax
 To delete data from a table, you use the =DELETE= statement as follows:
 
 #+begin_src sql
@@ -5856,7 +5909,7 @@ deleted.
 The following ~delete.js~ program illustrates how to delete a row from the
 =langs= table:
 
-#+caption:How to delete a row from the =langs= table
+#+caption[Delete row]:How to delete a row from the =langs= table
 #+name:delete.js
 #+begin_src js :tangle src/delete.js :mkdirp yes
 const sqlite3 = require('sqlite3').verbose();
@@ -5933,6 +5986,13 @@ The output showed that one row has been deleted successfully.
 :END:
 
 #+texinfo:@listoffloats Figure
+
+* List of Programs
+:PROPERTIES:
+:unnumbered: t
+:END:
+
+#+texinfo:@listoffloats Listing
 
 * Index
 :PROPERTIES:
