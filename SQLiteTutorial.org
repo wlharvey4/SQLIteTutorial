@@ -1,8 +1,8 @@
 # -*- mode:org; fill-column:79; -*-
 #+title:SQLite Tutorial
 #+subtitle:{{{version}}}
-#+date:2019-07-06 16:01
-#+macro:version Version 0.0.27 {{{date}}}
+#+date:2019-07-06 16:39
+#+macro:version Version 0.0.28 {{{date}}}
 * Introduction
 - [[https://www.sqlite.org/index.html][SQLite Home]]
 - [[https://www.sqlite.org/docs.html][SQLite Documentation]]
@@ -5865,7 +5865,7 @@ db.close();
 #+end_src
 
 *** Node-SQLite3 API
-**** Main
+**** sqlite3 Main Methods
 
 {{{heading(Database Constructor)}}}
 
@@ -5916,7 +5916,144 @@ Sets the execution mode to verbose to produce long stack traces.  There is no
 way to reset this.  See the wiki page on debugging for more information.
 #+end_defmethod
 
-**** Database
+**** sqlite3 Database Methods
+{{{heading(Database.close())}}}
+
+#+attr_texinfo: :options Database close ([callback])
+#+begin_defmethod
+Closes the database.
+
+- CALLBACK :: [optional] If provided, this function will be called when the
+              database was closed successfully or when an error occurred.
+
+  The first argument is an error object. When it is =null=, closing succeeded.
+
+  If no callback is provided and an error occurred, an =error= event with the
+              =error= object as the only parameter will be emitted on the
+              database object.
+
+  If closing succeeded, a =close= event with no parameters is emitted,
+              regardless of whether a callback was provided or not.
+
+  : function (err) { if (err) { ... } else { ... } }
+
+- Example ::
+
+             : db.close();
+#+end_defmethod
+
+{{{heading(Database.configure())}}}
+
+#+attr_texinfo: :options Database configure (option, value)
+#+begin_defmethod
+Set a configuration option for the database.  Valid options are:
+
+- Tracing & profiling ::
+
+  - trace ::
+
+             provide a function callback as a value. Invoked when an SQL
+             statement executes, with a rendering of the statement text.
+
+  - profile ::
+
+               provide a function callback. Invoked every time an SQL statement
+               executes.
+
+- busyTimeout ::
+
+                 provide an integer as a value. Sets the busy timeout.
+#+end_defmethod
+
+{{{heading(Database.run())}}}
+
+#+attr_texinfo: :options Database run (sql, [param, ...], [callback])
+#+begin_defmethod
+Runs the SQL query with the specified PARAMETERS and calls the CALLBACK
+afterwards.  It does not retrieve any result data.  The function returns the
+Database object for which it was called to allow for function chaining.
+
+- SQL ::
+
+         The SQL query to run.  If the SQL query is invalid and a callback was
+         passed to the function, it is called with an =error= object containing
+         the error message from SQLite.  If no callback was passed and
+         preparing fails, an =error= event will be emitted on the underlying
+         =Statement= object.
+
+- PARAM :: [optional] When the SQL statement contains placeholders, you can
+           pass them in here.  They will be bound to the statement before it is
+           executed.
+
+  There are three ways of passing bind parameters:
+
+  - directly in the function's arguments
+    : db.run("UPDATE tbl SET name = ? WHERE id = ?", "bar", 2);
+
+  - as an array
+    : db.run("UPDATE tbl SET name = ? WHERE id = ?", [ "bar", 2 ]);
+
+  - as an object for named parameters.
+    #+begin_src sql
+      db.run("UPDATE tbl SET name = $name WHERE id = $id", {
+         $id: 2,
+         $name: "bar"
+      });
+    #+end_src
+
+  Named parameters can be prefixed with =:name=, =@name= and =$name=.  We
+           recommend using =$name= since JavaScript allows using the dollar
+           sign as a variable name without having to escape it.  You can also
+           specify a numeric index after a =?= placeholder.  These correspond
+           to the position in the array.  *Note* that placeholder indexes start
+           at 1 in SQLite.  ~node-sqlite3~ maps arrays to start with one so
+           that you don't have to specify an empty value as the first array
+           element (with index 0). You can also use numeric object keys to bind
+           values.  Note that in this case, the first index is 1:
+
+    #+begin_src sql
+      db.run("UPDATE tbl SET name = ?5 WHERE id = ?", {
+         1: 2,
+         5: "bar"
+      });
+    #+end_src
+
+    This binds the first placeholder (=$id=) to 2 and the placeholder with index
+    5 to "bar".
+
+    If you use an array or an object to bind parameters, it must be the first
+    value in the bind arguments list.  If any other object is before it, an
+    error will be thrown.  Additional bind parameters after an array or object
+    will be ignored.
+
+- CALLBACK :: [optional] If given, it will be called when an error occurs
+              during any step of the statement preparation or execution, and
+              after the query has run.
+
+  - If an error occurs, the first (and only) parameter will be an =error=
+    object containing the error message.
+
+  - If execution is successful, the first parameter is =null=.
+
+  - The context of the function (the ~this~ object inside the function) is the
+    statement object.  If execution is successful, the ~this~ object will
+    contain two properties named =lastID= and =changes=, which contain the
+    value of the last inserted row ID and the number of rows affected by this
+    query, respectively.
+
+  - Note that =lastID= only contains valid information when the query was a
+    successfully completed =INSERT= statement and =changes= only contains valid
+    information when the query was a successfully completed =UPDATE= or
+    =DELETE= statement.  In all other cases, the content of these properties is
+    inaccurate and should not be used.  The ~.run()~ function is the only query
+    method that sets these two values; all other query methods such as ~.all()~
+    or ~.get()~ don't retrieve these values.
+
+  - Note that it is not possible to run the statement again because it is
+    automatically finalized after running for the first time.  Any subsequent
+    attempts to run the statement again will fail.
+
+#+end_defmethod
 
 **** Statement
 
