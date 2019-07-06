@@ -1,8 +1,8 @@
 # -*- mode:org; fill-column:79; -*-
 #+title:SQLite Tutorial
 #+subtitle:{{{version}}}
-#+date:2019-06-15 08:33
-#+macro:version Version 0.0.15 {{{date}}}
+#+date:2019-07-05 20:00
+#+macro:version Version 0.0.16 {{{date}}}
 * Introduction
 - [[https://www.sqlite.org/index.html][SQLite Home]]
 - [[https://www.sqlite.org/docs.html][SQLite Documentation]]
@@ -5950,6 +5950,71 @@ node delete.js
 
 The output showed that one row has been deleted successfully.
 
+* PRAGMA Statements
+- [[https://www.sqlite.org/pragma.html][PRAGMA Statements in Documentation]]
+
+
+#+cindex:PRAGMA statement
+The =PRAGMA= statement is an SQL extension specific to SQLite and used to
+modify the operation of the SQLite library or to query the SQLite library for
+internal (non-table) data.  The PRAGMA statement is issued using the same
+interface as other SQLite commands (e.g. =SELECT=, =INSERT=) but is different
+in the following important respects:
+
+- Specific pragma statements may be removed and others added in future releases
+  of SQLite.  There is no guarantee of backwards compatibility.
+
+- No error messages are generated if an unknown pragma is issued.  Unknown
+  pragmas are simply ignored.  This means if there is a typo in a pragma
+  statement the library does not inform the user of the fact.
+
+- Some pragmas take effect during the SQL compilation stage, not the execution
+  stage.
+
+- The pragma command is specific to SQLite and is not compatible with any other
+  SQL database engine.
+
+** Pragma Syntax
+There are two forms; both yield identical results:
+
+#+begin_example
+pragma <pragma-name> (<pragma-value>)
+pragma <pragma-name=<pragma-value>
+#+end_example
+
+In many pragmas, the argument is a boolean (1 for =yes true on=, 2 for =no
+false off=.  When pragma takes a keyword argument, it will usually also take a
+numeric equivalent as well (0 and "no" mean the same thing); many pragmas
+return the number rather than the keyword.  Keyword arguments can optionally
+appear in quotes.  Some pragmas take a string literal as their argument.
+
+A pragma may have an optional <schema-name> before the pragma name
+(=<schema-name>.<pragma-name>=).  The <schema-name> is the name of an
+=ATTACH=-ed database or "main" or "temp" for the main and the =TEMP= databases.
+If the optional schema name is omitted, "main" is assumed.
+
+** Pragma Functions
+PRAGMAs that return results and that have no side-effects can be accessed from
+ordinary SELECT statements as [[https://www.sqlite.org/vtab.html#tabfunc2][table-valued functions]].  For each participating
+PRAGMA, the corresponding table-valued function has the same name as the PRAGMA
+with a 7-character "pragma_" prefix.
+
+: PRAGMA index_info('idx52');
+: SELECT * FROM pragma_index_info('idx52')
+
+The advantage of the table-valued function format is that the query can return
+just a subset of the =PRAGMA= columns, can include a =WHERE= clause, can use
+aggregate functions, and the table-valued function can be just one of several
+data sources in a join.
+
+Table-valued functions exist only for PRAGMAs that return results and that have
+no side-effects.  The table-valued functions for PRAGMA feature was added in
+SQLite version 3.16.0 (2017-01-02).  Prior versions of SQLite cannot use this
+feature.
+
+** List Of PRAGMAs
+- https://www.sqlite.org/pragma.html
+
 * SQLite Resources
 - http://www.sqlitetutorial.net/sqlite-resources/
 
@@ -6018,7 +6083,8 @@ The output showed that one row has been deleted successfully.
 #+latex_header:
 
 ** Texinfo Export Options
-#+texinfo_filename:SQLiteTutorial.info
+#+options: toc:nil H:4
+#+texinfo_filename:sqlite-tutorial.info
 #+texinfo_class: info
 #+texinfo_header:
 #+texinfo_post_header:
