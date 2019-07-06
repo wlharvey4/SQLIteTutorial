@@ -1,8 +1,8 @@
 # -*- mode:org; fill-column:79; -*-
 #+title:SQLite Tutorial
 #+subtitle:{{{version}}}
-#+date:2019-07-06 08:17
-#+macro:version Version 0.0.19 {{{date}}}
+#+date:2019-07-06 08:28
+#+macro:version Version 0.0.20 {{{date}}}
 * Introduction
 - [[https://www.sqlite.org/index.html][SQLite Home]]
 - [[https://www.sqlite.org/docs.html][SQLite Documentation]]
@@ -3759,6 +3759,8 @@ needed.
 In addition, the way SQLite assigns a value for the =AUTOINCREMENT= column is
 slightly different from the way it does for the =rowid= column.
 
+*** SQLite =FOREIGN KEY= Constraint
+
 *** SQLite =NOT NULL= Constraint
 - http://www.sqlitetutorial.net/sqlite-not-null-constraint/
 
@@ -3766,6 +3768,37 @@ slightly different from the way it does for the =rowid= column.
 
      ensure values in a column are not NULL.
 
+**** Introduction to SQLite =NOT NULL= Constraint
+#+cindex:@code{NOT NULL} constraint
+When you create a table, you can specify whether a column accepts =NULL= values
+or not.  By default, all columns in a table accept =NULL= values unless you
+explicitly use the =NOT NULL= constraint.
+
+To define a =NOT NULL= constraint for a column, you use the following syntax:
+
+#+begin_src sql
+CREATE TABLE table_name (
+    ...,
+    column_name type_name NOT NULL,
+    ...
+);
+#+end_src
+
+Unlike other constraints such as =PRIMARY KEY= and =CHECK=, you can only define
+=NOT NULL= constraints at the column level, not the table level.
+
+Based on the SQL standard, =PRIMARY KEY= should always imply =NOT NULL=.
+However, SQLite allows =NULL= values in most =PRIMARY KEY= columns except that
+a column is =INTEGER PRIMARY KEY= column or the table is a =WITHOUT ROWID=
+table or the column is defined as a =NOT NULL= column.  This is due to a bug in
+some early versions.  If this bug is fixed to conform with the SQL standard,
+then it might break the legacy systems.  Therefore, it has been decided to
+allow =NULL= values in most =PRIMARY KEY= columns.
+
+#+cindex:constraint violation
+Once a =NOT NULL= constraint is attached to a column, any attempt to set the
+column value to =NULL= such as inserting or updating will cause a constraint
+violation.
 
 *** SQLite =UNIQUE= Constraint
 - http://www.sqlitetutorial.net/sqlite-unique-constraint/
@@ -3774,6 +3807,51 @@ slightly different from the way it does for the =rowid= column.
 
      ensure values in a column or a group of columns are unique.
 
+**** Introduction to SQLite =UNIQUE= Constraint
+A =UNIQUE= constraint ensures all values in a column or a group of columns are
+distinct from one another or unique.  To define a =UNIQUE= constraint, you use
+the =UNIQUE= keyword followed by one or more columns.  You can define a
+=UNIQUE= constraint at the column or the table level.  Only at the table level,
+you can define a =UNIQUE= constraint across multiple columns.
+
+The following shows how to define a =UNIQUE= constraint for a column at the
+column level:
+
+#+begin_src sql
+CREATE TABLE table_name(
+    ...,
+    column_name type UNIQUE,
+    ...
+);
+#+end_src
+
+Or at the table level:
+
+#+begin_src sql
+CREATE TABLE table_name(
+    ...,
+    UNIQUE(column_name)
+);
+#+end_src
+
+The following illustrates how to define a =UNIQUE= constraint for multiple
+columns:
+
+#+begin_src sql
+CREATE TABLE table_name(
+    ...,
+    UNIQUE(column_name1,column_name2,...)
+);
+#+end_src
+
+Once a =UNIQUE= constraint is defined, if you attempt to insert or update a
+value that already exists in the column, SQLite will issue an error and abort
+the operation.
+
+{{{heading(UNIQUE Constraint and NULL Values)}}}
+
+SQLite treats all =NULL= values as different; therefore, a column with a
+=UNIQUE= constraint can have multiple =NULL= values.
 
 *** SQLite =CHECK= Constraint
 - http://www.sqlitetutorial.net/sqlite-check-constraint/
