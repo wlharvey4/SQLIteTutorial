@@ -1,8 +1,8 @@
 # -*- mode:org; fill-column:79; -*-
 #+title:SQLite Tutorial
 #+subtitle:{{{version}}}
-#+date:2019-07-06 15:05
-#+macro:version Version 0.0.26 {{{date}}}
+#+date:2019-07-06 16:01
+#+macro:version Version 0.0.27 {{{date}}}
 * Introduction
 - [[https://www.sqlite.org/index.html][SQLite Home]]
 - [[https://www.sqlite.org/docs.html][SQLite Documentation]]
@@ -5833,8 +5833,92 @@ features:
 - Bundles SQLite as a fallback
 
 
-To understand how the ~sqlite3~ module works, you can use the following
-tutorials in sequence:
+#+cindex:function call serialization
+#+cindex:@command{Database.close()} function
+~node-sqlite3~ has built-in function call serialization and automatically waits
+before executing a blocking action until no other action is pending.  /This
+means that it's safe to start calling functions on the database object even if
+it is not yet fully opened/.  The ~Database#close()~ function will wait until
+all pending queries are completed before closing the database.
+
+{{{heading(Sample Usage)}}}
+
+#+begin_src js -n
+var sqlite3 = require('sqlite3').verbose();
+var db = new sqlite3.Database(':memory:');
+
+db.serialize(function() {
+  db.run("CREATE TABLE lorem (info TEXT)");
+
+  var stmt = db.prepare("INSERT INTO lorem VALUES (?)");
+  for (var i = 0; i < 10; i++) {
+      stmt.run("Ipsum " + i);
+  }
+  stmt.finalize();
+
+  db.each("SELECT rowid AS id, info FROM lorem", function(err, row) {
+      console.log(row.id + ": " + row.info);
+  });
+});
+
+db.close();
+#+end_src
+
+*** Node-SQLite3 API
+**** Main
+
+{{{heading(Database Constructor)}}}
+
+#+attr_texinfo: :options Constructor sqlite3 {new Database} (filename, [mode], [callback])
+#+begin_defop
+Returns a new Database object and automatically opens the database.  There is
+no separate method to open the database.
+
+- FILENAME :: Valid values are
+  - filenames
+  - ":memory:" for an anonymous in-memory database; and
+  - an empty string for an anonymous disk-based database.  Anonymous databases
+    are not persisted and when closing the database handle, their contents are
+    lost.
+
+- MODE :: [optional] One or more of
+  - =sqlite3.OPEN_READONLY=
+  - =sqlite3.OPEN_READWRITE=
+  - =sqlite3.OPEN_CREATE=
+  - The default value is =OPEN_READWRITE | OPEN_CREATE=
+
+- CALLBACK :: [optional] If provided, this function will be called when the
+              database is opened successfully or when an error occurrs.
+
+  The first argument is an =error= object.  When it is =null=, opening
+              succeeded.
+
+              : function (err) { ... }
+
+  If no callback is provided and an error occurrs, an =error= event with the
+              =error= object as the only parameter will be emitted on the
+              database object.  If opening succeeded, an =open= event with no
+              parameters is emitted, regardless of whether a callback was
+              provided or not.
+
+- Example ::
+
+  : var db = new sqlite3.Database(':memory:');
+#+end_defop
+
+{{{heading(sqlite3.verbose() Method)}}}
+#+cindex:stack trace, sqlite3
+#+cindex:debugging, sqlite3
+
+#+attr_texinfo: :options sqlite3 verbose ()
+#+begin_defmethod
+Sets the execution mode to verbose to produce long stack traces.  There is no
+way to reset this.  See the wiki page on debugging for more information.
+#+end_defmethod
+
+**** Database
+
+**** Statement
 
 *** Connect To an SQLite Database Using Node.js
 - http://www.sqlitetutorial.net/sqlite-nodejs/connect/
@@ -7091,6 +7175,11 @@ The output showed that one row has been deleted successfully.
 :PROPERTIES:
 :unnumbered: t
 :index:    cp
+:END:
+* Function Index
+:PROPERTIES:
+:unnumbered: t
+:index:    fn
 :END:
 * Export Options                                                   :noexport:
 ** HTML Export Options
