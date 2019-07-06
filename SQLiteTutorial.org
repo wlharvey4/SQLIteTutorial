@@ -1,8 +1,8 @@
 # -*- mode:org; fill-column:79; -*-
 #+title:SQLite Tutorial
 #+subtitle:{{{version}}}
-#+date:2019-07-05 20:00
-#+macro:version Version 0.0.16 {{{date}}}
+#+date:2019-07-05 20:58
+#+macro:version Version 0.0.17 {{{date}}}
 * Introduction
 - [[https://www.sqlite.org/index.html][SQLite Home]]
 - [[https://www.sqlite.org/docs.html][SQLite Documentation]]
@@ -3409,8 +3409,169 @@ type of data.
 
 - SQLite Create Table ::
 
-     show you how to create a new table in the database.
+     #+cindex:create new table
+     shows you how to create a new table in the database.
 
+
+- *Summary* ::
+
+               In this tutorial, you will learn how to create new tables using
+               SQLite =CREATE TABLE= statement using various options.
+
+**** Introduction to SQLite =CREATE TABLE= Statement
+#+cindex:@command{CREATE TABLE} statement
+To create a new table in SQLite, you use =CREATE TABLE= statement using the
+following syntax:
+
+#+begin_src sql
+  CREATE TABLE [IF NOT EXISTS] [schema_name].table_name (
+     column_1 data_type PRIMARY KEY,
+     column_2 data_type NOT NULL,
+     column_3 data_type DEFAULT 0,
+     table_constraint
+  ) [WITHOUT ROWID];
+#+end_src
+
+{{{heading(Attributes)}}}
+
+#+cindex:attributes, @command{CREATE TABLE} statement
+To create a table you specify the following /attributes/:
+
+- name ::
+
+          #+cindex:name attribute
+          The name of the table.  You cannot create a table that already exists
+          in the current database.  To avoid this, you can use an optional
+          clause =IF NOT EXISTS= to instruct SQLite to create a new table if
+          the table does not exist; otherwise, just ignore the statement.
+
+- database ::
+
+              #+cindex:database attribute
+              The database to which table belongs.  It may be the main database,
+              temp database or any attached database.
+
+- column names, data type, [constraint] ::
+
+     #+cindex:constraints
+     The name of each column, its datatype, and an optional constraint.  SQLite
+     supports the following constraints:
+
+  - PRIMARY KEY: a column or group of columns that uniquely identifies a row in
+    the table
+  - UNIQUE,
+  - NOT NULL, and
+  - CHECK constraints.
+
+- =WITHOUT ROWID= ::
+
+     By default, a row in a table has an implicit column, which can be referred
+     to as the =rowid=, =oid= or =_rowid_= column.  The =rowid= column stores a
+     64-bit signed integer key that uniquely identifies the row inside the
+     table.  If you don’t want SQLite to create the =rowid= column, you can
+     specify the =WITHOUT ROWID= option in the =CREATE TABLE= statement.
+
+**** SQLite =CREATE TABLE= Examples
+Suppose you have to manage contacts using SQLite.
+
+Each contact has the following information:
+- first name
+- last name
+- email
+- phone
+
+
+Both email and phone must be unique.  In addition, each contact belongs to one
+or many groups, and each group has zero or multiple contacts.  With these
+requirements, you come up with three tables:
+
+- The =contacts= table stores contact information.
+
+- The =groups= table stores group information.
+
+- The =contact_groups= table stores the relationship between contacts and
+  groups.
+
+
+The following database diagram illustrates these tables:
+
+[[file:figs/SQLite-CREATE-TABLE-example.jpg]]
+
+{{{heading(Contacts Table)}}}
+
+The following statement creates the =contacts= table.
+
+#+begin_src sql
+CREATE TABLE contacts (
+ contact_id INTEGER PRIMARY KEY,
+ first_name TEXT NOT NULL,
+ last_name TEXT NOT NULL,
+ email text NOT NULL UNIQUE,
+ phone text NOT NULL UNIQUE
+);
+#+end_src
+
+#+cindex:@command{COLUMN PRIMARY KEY} constraint
+The =contact_id= is the primary key of the =contacts= table.  Because the
+primary key consists of one column, you can use =column= constraint to make the
+=contact_id= column as the primary key.
+
+#+cindex:@command{NOT NULL} constraint
+The =first_name= and =last_name= columns have =TEXT= storage class and those
+columns are =NOT NULL=.  It means you must provide values when you insert or
+update rows in the =contacts= table.
+
+#+cindex:@command{UNIQUE} constraint
+The email and phone are unique therefore you use the =UNIQUE= constraint for
+each column.
+
+{{{heading(Groups Table)}}}
+
+The following statement creates the =groups= table:
+
+#+begin_src sql
+CREATE TABLE groups (
+ group_id integer PRIMARY KEY,
+ name text NOT NULL
+);
+#+end_src
+
+{{{heading(Contacts Group Table)}}}
+
+#+begin_src sql
+CREATE TABLE contact_groups (
+ contact_id integer,
+ group_id integer,
+ PRIMARY KEY (contact_id, group_id),
+ FOREIGN KEY (contact_id) REFERENCES contacts (contact_id) 
+ ON DELETE CASCADE ON UPDATE NO ACTION,
+ FOREIGN KEY (group_id) REFERENCES groups (group_id) 
+ ON DELETE CASCADE ON UPDATE NO ACTION
+);
+#+end_src
+
+#+cindex:@command{PRIMARY KEY} table constraint
+The =contact_groups= table has a primary key that consists of two columns:
+=contact_id=, =group_id=.  To add the primary key constraint you use =PRIMARY
+KEY= table constraint:
+
+: PRIMARY KEY (contact_id, group_id)
+
+#+cindex:foreign key constraint
+In addition, the =contact_id= and =group_id= are the foreign keys.  Therefore,
+you use =FOREIGN KEY= constraint to define the foreign key for each column.
+
+#+begin_src sql
+FOREIGN KEY (contact_id) REFERENCES contacts (contact_id) 
+ ON DELETE CASCADE ON UPDATE NO ACTION
+#+end_src
+
+#+begin_src sql
+FOREIGN KEY (group_id) REFERENCES groups (group_id) 
+ ON DELETE CASCADE ON UPDATE NO ACTION
+#+end_src
+
+Note that we will discuss this in the =FOREIGN KEY= constraint tutorial.
 
 *** SQLite =PRIMARY KEY=
 - http://www.sqlitetutorial.net/sqlite-primary-key/
