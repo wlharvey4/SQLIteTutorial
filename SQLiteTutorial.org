@@ -1,8 +1,8 @@
 # -*- mode:org; fill-column:79; -*-
 #+title:SQLite Tutorial
 #+subtitle:{{{version}}}
-#+date:2019-07-06 10:29
-#+macro:version Version 0.0.25 {{{date}}}
+#+date:2019-07-06 15:05
+#+macro:version Version 0.0.26 {{{date}}}
 * Introduction
 - [[https://www.sqlite.org/index.html][SQLite Home]]
 - [[https://www.sqlite.org/docs.html][SQLite Documentation]]
@@ -5810,6 +5810,15 @@ know how to open a database connection and perform common database operations
 such as select, insert, update, and delete.  In addition, you will learn how to
 execute SQL statements in serialized mode or in parallel mode.
 
+*** The Node.js sqlite3 Module
+#+cindex:@command{sqlite3} npm module
+#+cindex:npm module, @command{sqlite3}
+Asynchronous, non-blocking SQLite3 bindings for Node.js.
+
+- [[https://www.npmjs.com/package/sqlite3][sqlite3 npm home]]
+- [[https://github.com/mapbox/node-sqlite3/wiki][sqlite3 API Documentation]]
+
+
 #+cindex:@command{sqlite3} features
 The ~sqlite3~ module is actively maintained and provides a rich set of
 features:
@@ -5833,7 +5842,6 @@ tutorials in sequence:
 
 - Summary :: in this tutorial, you will learn how to connect to an SQLite
              database from Node.js applications.
-
 
 **** Installing sqlite3 module
 #+cindex:@command{sqlite3} module, Node.js
