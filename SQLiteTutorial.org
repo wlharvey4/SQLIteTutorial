@@ -1,8 +1,8 @@
 # -*- mode:org; fill-column:79; -*-
 #+title:SQLite Tutorial
 #+subtitle:{{{version}}}
-#+date:2019-07-06 08:06
-#+macro:version Version 0.0.18 {{{date}}}
+#+date:2019-07-06 08:17
+#+macro:version Version 0.0.19 {{{date}}}
 * Introduction
 - [[https://www.sqlite.org/index.html][SQLite Home]]
 - [[https://www.sqlite.org/docs.html][SQLite Documentation]]
@@ -3584,7 +3584,6 @@ Note that we will discuss this in the =FOREIGN KEY= constraint tutorial.
              in this tutorial, you will learn how to use SQLite =PRIMARY KEY=
              constraint to define the primary key for a table.
 
-
 **** Introduction to SQLite Primary Key
 #+cindex:primary key
 A primary key is a column or group of columns used to identify the uniqueness
@@ -3723,6 +3722,42 @@ COMMIT;
 
 PRAGMA foreign_keys=on;
 #+end_src
+
+**** SQLite AUTOINCREMENT---Why You Should Avoid Using It
+Whenever you create a table without specifying the =WITHOUT ROWID= option, you
+get an implicit auto increment column called =rowid=.  SQLite automatically
+creates an implicit column named =rowid= and automatically assigns an integer
+value whenever you insert a new row.
+
+#+cindex:@code{rowid}
+#+cindex:@code{_rowid_}
+#+cindex:@code{oid}
+You can refer to the =rowid= column using its two alias such as =_rowid_= or
+=oid=.
+
+If you create a table that has an =INTEGER PRIMARY KEY= column, this column
+points to the =rowid= column.
+
+How does SQLite assign an integer value to the =rowid= column?  If you don’t
+specify the =rowid= value or you use a =NULL= value when you insert a new row,
+SQLite assigns an integer that is one larger than the largest =rowid= in the
+table.  In case you have never inserted any row, the =rowid= value is 1.  The
+maximum value of =rowid= column is 9223372036854775807.  If you reach this
+value and insert a new row, SQLite will find an unused integer and use it.  If
+SQLite could not find one, it issues an =SQLITE FULL= error.
+
+{{{heading(SQLite AUTOINCREMENT attribute)}}}
+
+SQLite recommends that you should not use =AUTOINCREMENT= attribute because:
+
+#+begin_quote
+The AUTOINCREMENT keyword imposes extra CPU, memory, disk space, and disk I/O
+overhead and should be avoided if not strictly needed.  It is usually not
+needed.
+#+end_quote
+
+In addition, the way SQLite assigns a value for the =AUTOINCREMENT= column is
+slightly different from the way it does for the =rowid= column.
 
 *** SQLite =NOT NULL= Constraint
 - http://www.sqlitetutorial.net/sqlite-not-null-constraint/
