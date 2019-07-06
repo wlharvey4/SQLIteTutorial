@@ -1,8 +1,8 @@
 # -*- mode:org; fill-column:79; -*-
 #+title:SQLite Tutorial
 #+subtitle:{{{version}}}
-#+date:2019-07-05 20:58
-#+macro:version Version 0.0.17 {{{date}}}
+#+date:2019-07-06 08:06
+#+macro:version Version 0.0.18 {{{date}}}
 * Introduction
 - [[https://www.sqlite.org/index.html][SQLite Home]]
 - [[https://www.sqlite.org/docs.html][SQLite Documentation]]
@@ -3386,7 +3386,6 @@ storage classes, SQLite performs the following steps:
 
 - Second, sort the values in each group.
 
-
 **** SQLite Manifest Typing and Type Affinity
 Other important concepts related to SQLite data types are /manifest typing/ and
 /type affinity/.
@@ -3402,7 +3401,6 @@ Manifest typing means two things:
 Type affinity of a column is the recommended type of data that a column stores.
 It is only recommended, not required, and so therefore a column can store any
 type of data.
-
 
 *** SQLite =CREATE TABLE=
 - http://www.sqlitetutorial.net/sqlite-create-table/
@@ -3580,6 +3578,151 @@ Note that we will discuss this in the =FOREIGN KEY= constraint tutorial.
 
      show you how to define the primary key for a table.
 
+- Summary ::
+
+             #+cindex:@code{PRIMARY KEY} constraint
+             in this tutorial, you will learn how to use SQLite =PRIMARY KEY=
+             constraint to define the primary key for a table.
+
+
+**** Introduction to SQLite Primary Key
+#+cindex:primary key
+A primary key is a column or group of columns used to identify the uniqueness
+of rows in a table.  Each table has one and only one primary key.
+
+SQLite allows you to define primary key in two ways:
+
+#+cindex:@code{PRIMARY KEY} column constraint
+1. First, if the primary key consists of one column, you use the =PRIMARY KEY=
+   column constraint to define the primary key as follows:
+
+   #+begin_example
+   CREATE TABLE table_name(
+   column_1 NOT NULL INTEGER PRIMARY KEY,
+   ...
+   );
+   #+end_example
+
+   #+cindex:@code{PRIMARY KEY} table constraint
+2. Second, in case primary key consists of more than 2 columns, you use the
+   =PRIMARY KEY= table constraint to define the primary as the following
+   statement.
+
+   #+begin_example
+   CREATE TABLE table_name(
+      column_1 NOT NULL INTEGER,
+      column_2 NOT NULL INTEGER,
+      ...
+      PRIMARY KEY(column_1,column_2,...)
+   );
+   #+end_example
+
+#+cindex:@code{NOT NULL} constraint, implicit
+In the SQL-standard, the primary key column must not contain =NULL= values.  It
+means that the primary key column has an implicit =NOT NULL= constraint.
+However, to make the current version of SQLite compatible with the earlier
+versions, SQLite allows the primary key column to contain =NULL= values.
+
+**** SQLite primary key and rowid table
+#+cindex:@code{WITHOUT ROWID} option
+#+cindex:@code{rowid} column
+#+cindex:@code{rowid table}
+When you create a table without specifying the =WITHOUT ROWID= option, SQLite
+adds an implicit column called =rowid= that stores 64-bit signed integer.  The
+=rowid= column is a key that uniquely identifies the row within its table.  A
+table that has the =rowid= column is called a =rowid table=.
+
+#+cindex:alias for @code{rowid} column
+If a table has a primary key that consists of one column, and that column is
+defined as =INTEGER=, exactly =INTEGER= in any case, such as =INTEGER=,
+=integer=, etc., then this primary key column becomes an alias for the =rowid=
+column.  Notice that if you assign another integer type such as: =BIGINT=,
+=UNSIGNED INT=, etc., to the primary key column, this column is not the alias
+for the =rowid= column.
+
+#+cindex:B-Tree
+Because the =rowid table= stores data as a B-Tree, querying and sorting data
+using =rowid= are very fast.  It is faster than using a primary key that is not
+an alias of the =rowid=.
+
+Another important note is that if you declare a column with the =INTEGER= type
+and =PRIMARY KEY DESC= clause, it does not become an alias for the =rowid=
+column.
+
+**** Creating SQLite primary key examples
+The following statement creates a table named =countries= with the =country_id=
+column as the primary key.
+
+#+begin_src sql
+CREATE TABLE countries (
+ country_id INTEGER PRIMARY KEY,
+ name text NOT NULL
+);
+#+end_src
+
+Because the primary key of the =countries= table consists of one column, we
+define the primary key using =PRIMARY KEY= column constraint.
+
+You can use the =PRIMARY KEY= table constraint to define the primary key that
+consists of one column.  It works just fine as the following statement:
+
+#+begin_src sql
+CREATE TABLE languages (
+ language_id integer,
+ name text NOT NULL,
+ PRIMARY KEY (language_id)
+);
+#+end_src
+
+However, with the table whose primary key consists of more than one column, you
+must use =PRIMARY KEY= table constraint to define the primary key.
+
+The following statement creates the =country_languages= table whose primary key
+consists of two columns.
+
+#+begin_src sql
+CREATE TABLE country_languages (
+ country_id integer NOT NULL,
+ language_id integer NOT NULL,
+ PRIMARY KEY (country_id, language_id),
+ FOREIGN KEY (country_id) REFERENCES countries (country_id) 
+            ON DELETE CASCADE ON UPDATE NO ACTION,
+ FOREIGN KEY (language_id) REFERENCES languages (language_id) 
+            ON DELETE CASCADE ON UPDATE NO ACTION
+);
+#+end_src
+
+**** Adding SQLite primary key example
+Unlike other database systems e.g., MySQL, PostgreSQL, etc., you cannot use the
+=ALTER TABLE= statement to add a primary key to an existing table.
+
+To work around this, you need to:
+
+1. First, set the foreign key check off.
+2. Next, rename the table to another table name (=old_table=)
+3. Then, create a new table (table) with the exact structure of the table you
+   have been renamed.
+4. After that, copy data from the =old_table= to the table.
+5. Finally, turn on the foreign key check on
+
+
+See the following statements:
+
+#+begin_src sql
+PRAGMA foreign_keys=off;
+
+BEGIN TRANSACTION;
+
+ALTER TABLE table RENAME TO old_table;
+
+CREATE TABLE table ( ... );
+
+INSERT INTO table SELECT * FROM old_table;
+
+COMMIT;
+
+PRAGMA foreign_keys=on;
+#+end_src
 
 *** SQLite =NOT NULL= Constraint
 - http://www.sqlitetutorial.net/sqlite-not-null-constraint/
