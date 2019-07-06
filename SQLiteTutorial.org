@@ -1,8 +1,8 @@
 # -*- mode:org; fill-column:79; -*-
 #+title:SQLite Tutorial
 #+subtitle:{{{version}}}
-#+date:2019-07-06 10:09
-#+macro:version Version 0.0.23 {{{date}}}
+#+date:2019-07-06 10:19
+#+macro:version Version 0.0.24 {{{date}}}
 * Introduction
 - [[https://www.sqlite.org/index.html][SQLite Home]]
 - [[https://www.sqlite.org/docs.html][SQLite Documentation]]
@@ -4207,6 +4207,78 @@ Therefore, you should perform the =DROP TABLE= statement with extra caution.
 - SQLite VACUUM ::
 
                    show you how to optimize database file.
+
+
+{{{heading(Why the Vacuum Command)}}}
+
+#+cindex:@command{VACUUM} command
+First, when you drop database objects such as tables, views, indexes, and
+triggers or delete data from tables, the database file size remains unchanged.
+Because SQLite just marks the deleted objects as free and reserves it for the
+future uses.  As a result, the size of the database file always grows in size.
+
+Second, when you insert or delete data from the tables, the indexes and tables
+become fragmented, especially for the database that has a high number of
+inserts, updates, and deletes.
+
+Third, the insert, update, and delete operations create unused data blocks
+within individual database pages.  It decreases the number of rows that can be
+stored in a single page.  Therefore, it increases the number of pages to hold a
+table.  Because of this, it increases storage overhead for the table, takes
+more time to read/write, and decreases the cache performance.
+
+SQLite provides the VACUUM command to address all three issues above.
+
+{{{heading(How the Vacuum Command Works)}}}
+
+SQLite first copies data within a database file to a temporary database.  This
+operation defragments the database objects, ignores the free spaces, and
+repacks individual pages.  Then, SQLite copies the content of the temporary
+database file back to the original database file.  The original database file
+is overwritten.
+
+Because the VACUUM command rebuilds the database, you can use it to change some
+database-specific configuration parameters such as page size, page format,
+default encoding, etc.  To do this, you set new values using pragma and then
+vacuum the database.
+
+**** The SQLite VACUUM command
+The =VACUUM= command does not change the content of the database except the
+=rowid= values.  If you use =INTEGER PRIMARY KEY= column, the =VACUUM= does not
+change values of that column.  However, if you use unaliased =rowid=, the
+=VACUUM= command will reset the =rowid= values.  Besides changing the =rowid=
+values, the =VACUUM= command also builds the index from the scratch.
+
+It is a good practice to perform the =VACUUM= command periodically, especially
+when you delete the large table or index.
+
+To run the =VACUUM= command, you need to issue it as simple as the following
+statement:
+
+#+begin_src sql
+VACUUM;
+#+end_src
+
+Make sure that there is no open transaction while you run the command.
+
+#+cindex:auto_vacuum pragma
+The following statement enables full auto-vacuum mode:
+
+#+begin_src sql
+PRAGMA auto_vacuum = FULL;
+#+end_src
+
+To enable incremental vacuum, you use the following statement:
+
+#+begin_src sql
+PRAGMA auto_vacuum = INCREMENTAL;
+#+end_src
+
+The following statement disables auto-vacuum mode:
+
+#+begin_src sql
+PRAGMA auto_vacuum = NONE;
+#+end_src
 
 ** Views
 - http://www.sqlitetutorial.net/sqlite-create-view/
