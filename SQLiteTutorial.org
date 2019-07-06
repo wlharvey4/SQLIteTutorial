@@ -1,8 +1,8 @@
 # -*- mode:org; fill-column:79; -*-
 #+title:SQLite Tutorial
 #+subtitle:{{{version}}}
-#+date:2019-07-06 10:19
-#+macro:version Version 0.0.24 {{{date}}}
+#+date:2019-07-06 10:29
+#+macro:version Version 0.0.25 {{{date}}}
 * Introduction
 - [[https://www.sqlite.org/index.html][SQLite Home]]
 - [[https://www.sqlite.org/docs.html][SQLite Documentation]]
@@ -4885,8 +4885,25 @@ WHERE posts MATCH 'SQLite'
 ORDER BY rank;
 #+end_src
 
-** SQLite Tools
-*** SQLite Commands
+* SQLite Advanced Tutorials
+** SQLite Window Frame
+
+** SQLite =CUME_DIST=
+
+** SQLite =PERCENT_RANK=
+
+** SQLite =DENSE_RANK=
+
+** SQLite =NTILE=
+
+** SQLite =NTH_VALUE=
+
+** SQLite =LAST_VALUE=
+
+** SQLite =FIRST_VALUE=
+
+* SQLite Tools
+** SQLite Commands
 - http://www.sqlitetutorial.net/sqlite-commands/
 
 - SQLite Commands ::
@@ -4901,7 +4918,7 @@ The SQLite project delivers a simple command-line tool named ~sqlite3~ (or
 sqlite3.exe on Windows) that allows you to interact with the SQLite databases
 using SQL statements and commands.
 
-**** Connect to an SQLite database
+*** Connect to an SQLite database
 To start the ~sqlite3~, you type the ~sqlite3~ as follows:
 
 #+begin_src sh
@@ -4944,14 +4961,14 @@ Enter ".help" for usage hints.
 sqlite>
 #+end_src
 
-**** Show all available commands and their purposes
+*** Show all available commands and their purposes
 #+cindex:@command{.help} command
 To show all available commands and their purpose, you use the ~.help~ command as
 follows:
 
 : .help
 
-**** Show databases in the current database connection
+*** Show databases in the current database connection
 #+cindex:@command{.databases} command
 To show all databases in the current connection, you use the ~.databases~
 command.  The ~.databases~ command displays at least one database with the
@@ -4985,13 +5002,13 @@ seq  name             file
 2    chinook          c:\sqlite\chinook.db
 #+end_src
 
-**** Exit ~sqlite3~ tool
+*** Exit ~sqlite3~ tool
 #+cindex:@command{.exit} command
 To exit the ~sqlite3~ program, you use the ~.exit~ command.
 
 : sqlite>.exit
 
-**** Show tables in a database
+*** Show tables in a database
 #+cindex:@command{.tables} command
 To display all the tables in the current database, you use the ~.tables~
 command.  The following commands open a new database connection to the
@@ -5022,7 +5039,7 @@ employees    genres       invoices     media_types
 sqlite>
 #+end_src
 
-**** Show the structure of a table
+*** Show the structure of a table
 #+cindex:@command{.schema TABLE} command
 #+cindex:schema
 To display the structure of a table, you use the ~.schema TABLE~ command.  The
@@ -5051,7 +5068,7 @@ To show the schema and the content of the =sqlite_stat= tables, you use the
 
 : sqlite>.fullschema
 
-**** Show indexes
+*** Show indexes
 #+cindex:@command{.indexes} command
 To show all indexes of the current database, you use the ~.indexes~ command as
 follows:
@@ -5089,7 +5106,7 @@ IFK_EmployeeReportsTo
 IFK_InvoiceCustomerId
 #+end_src
 
-**** Save the result of a query into a file
+*** Save the result of a query into a file
 #+cindex:@command{.output FILENAME} command
 #+cindex:@command{.once FILENAME} command
 To save the result of a query into a file, you use the ~.output FILENAME~
@@ -5109,7 +5126,7 @@ sqlite> .output albums.txt
 sqlite> SELECT title FROM albums;
 #+end_src
 
-**** Execute SQL statements from a file
+*** Execute SQL statements from a file
 Suppose we have a file named ~commands.txt~ in the ~c:/sqlite/~ folder with the
 following content:
 
@@ -5141,7 +5158,7 @@ sqlite> .read c:/sqlite/commands.txt
 160         Ace Of Spades
 #+end_src
 
-*** SQLite =SHOW TABLES=
+** SQLite =SHOW TABLES=
 - http://www.sqlitetutorial.net
 
 - SQLite Show Tables ::
@@ -5153,7 +5170,7 @@ sqlite> .read c:/sqlite/commands.txt
                from an SQLite database by using SQLite command line shell
                program or by querying data from =sqlite_master= tables.
 
-**** Showing tables using the sqlite command line shell program
+*** Showing tables using the sqlite command line shell program
 To show tables in a database using the ~sqlite3~ command line shell program,
 you follow these steps:
 
@@ -5231,7 +5248,7 @@ The output is as follows:
 
 : playlist_track  tracks
 
-**** Showing tables using SQL statement
+*** Showing tables using SQL statement
 Another way to list all tables in a database is to query them from the
 =sqlite_master= table.
 
@@ -5249,7 +5266,7 @@ In this query, we filtered out all tables whose names start with =sqlite_=n
 such as =sqlite_stat1= and =sqlite_sequence= tables.  These tables are the
 system tables managed internally by SQLite.
 
-*** SQLite =DESCRIBE TABLE=
+** SQLite =DESCRIBE TABLE=
 - http://www.sqlitetutorial.net/sqlite-tutorial/sqlite-describe-table/
 
 - SQLite Describe Table ::
@@ -5260,7 +5277,7 @@ system tables managed internally by SQLite.
 - *Summary* :: in this tutorial, you will learn about various ways to show the
                structure of a table in SQLite.
 
-**** Getting the structure of a table via the SQLite command line shell program
+*** Getting the structure of a table via the SQLite command line shell program
 To find out the structure of a table via SQLite command line shell program, you
 follow these steps:
 
@@ -5305,7 +5322,7 @@ sqlite> pragma table_info('albums');
 
 Note that the first two commands are used to format the output nicely.
 
-**** Getting the structure of a table using SQL statement
+*** Getting the structure of a table using SQL statement
 You can find the structure of a table by querying it from the =sqlite_master=
 table as follows:
 
@@ -5333,7 +5350,7 @@ CREATE TABLE "albums"
 )
 #+end_src
 
-*** SQLite ~.dump~ Command
+** SQLite ~.dump~ Command
 - http://www.sqlitetutorial.net/sqlite-dump/
 
 - SQLite Dump ::
@@ -5358,7 +5375,7 @@ known as /dot-commands/ to perform various useful database operations.
 One of these dot-commands is the ~.dump~ command that gives you the ability to
 dump the entire database or tables into a text file.
 
-**** Dump the entire database into a file using SQLite dump command
+*** Dump the entire database into a file using SQLite dump command
 The following command opens a new SQLite database connection to the
 ~chinook.db~ file.
 
@@ -5388,7 +5405,7 @@ sqlite> .dump
 sqlite> .exit
 #+end_src
 
-**** Dump a specific table using the SQLite dump command
+*** Dump a specific table using the SQLite dump command
 If you want to dump a specific table, you need to specify the table name
 followed the ~.dump~ command.  For example, the following command saves the
 =albums= table to the ~albums.sql~ file.
@@ -5403,7 +5420,7 @@ The following picture shows the content of the ~albums.sql~ file.
 
 [[file:figs/SQLite-dump-example.png]]
 
-**** Dump tables structure only using schema command
+*** Dump tables structure only using schema command
 If you want to dump the structures of tables in a database, you use the
 ~.schema~ command.  The following commands set the output file to
 =chinook_structure.sql= file and save the structures of tables into the
@@ -5419,7 +5436,7 @@ The following picture shows the content of the =chinook_structure.sql= file.
 
 [[file:figs/SQLite-dump-structure.png]]
 
-**** Dump data of one or more tables into a file
+*** Dump data of one or more tables into a file
 To dump the data of a table into a text file, you use these steps:
 
 #+cindex:@command{.mode} command
@@ -5449,7 +5466,7 @@ the following output:
 To dump data from other tables, you need to issue the =SELECT= statements to
 query data from those tables.
 
-*** SQLite ~.import~ Command
+** SQLite ~.import~ Command
 - http://www.sqlitetutorial.net/sqlite-import-csv/
 
 - SQLite Import CSV ::
@@ -5460,7 +5477,7 @@ query data from those tables.
 - *Summary* :: this tutorial shows you various ways to import CSV data into an
                SQLite table using ~sqlite3~ and SQLite Studio tools.
 
-**** Importing a CSV file into a table using ~sqlite3~ tool
+*** Importing a CSV file into a table using ~sqlite3~ tool
 In the first scenario, you want to import data from a CSV file into a table
 that does not exist in the SQLite database.
 
@@ -5544,7 +5561,7 @@ sqlite> .mode csv
 sqlite> .import c:/sqlite/city_no_header.csv cities
 #+end_src
 
-*** SQLite ~.export~ Command
+** SQLite ~.export~ Command
 - http://www.sqlitetutorial.net//sqlite-tutorial/sqlite-export-csv/
 
 - SQLite Export CSV ::
@@ -5555,7 +5572,7 @@ sqlite> .import c:/sqlite/city_no_header.csv cities
 - *Summary* :: in this tutorial, you will learn how to export SQLite database
                to a CSV file.
 
-**** Export SQLite Database to a CSV file using sqlite3 tool
+*** Export SQLite Database to a CSV file using sqlite3 tool
 SQLite project provides you with a command-line program called ~sqlite3~ or
 sqlite3.exe on Windows.  By using the ~sqlite3~ tool, you can use the SQL
 statements and dot-commands to interact with the SQLite database.
@@ -5608,6 +5625,11 @@ If you have a file named ~query.sql~ that contains the script to query data,
 you can execute the statements in the file and export data to a CSV file.
 
 : >sqlite3 -header -csv c:/sqlite/chinook.db < query.sql > data.csv
+
+** SQLite GUI tools
+
+** Command Line Shell For SQLite
+- https://www.sqlite.org/cli.html
 
 * SQLite Functions
 ** SQLite Aggregate Functions
@@ -5693,6 +5715,71 @@ value.
 SQLite window functions perform a calculation on a set of rows that are related
 to the current row. Unlike aggregate functions, window functions do not cause
 rows to become grouped into a single result row.
+
+* PRAGMA Statements
+- [[https://www.sqlite.org/pragma.html][PRAGMA Statements in Documentation]]
+
+
+#+cindex:PRAGMA statement
+The =PRAGMA= statement is an SQL extension specific to SQLite and used to
+modify the operation of the SQLite library or to query the SQLite library for
+internal (non-table) data.  The PRAGMA statement is issued using the same
+interface as other SQLite commands (e.g. =SELECT=, =INSERT=) but is different
+in the following important respects:
+
+- Specific pragma statements may be removed and others added in future releases
+  of SQLite.  There is no guarantee of backwards compatibility.
+
+- No error messages are generated if an unknown pragma is issued.  Unknown
+  pragmas are simply ignored.  This means if there is a typo in a pragma
+  statement the library does not inform the user of the fact.
+
+- Some pragmas take effect during the SQL compilation stage, not the execution
+  stage.
+
+- The pragma command is specific to SQLite and is not compatible with any other
+  SQL database engine.
+
+** Pragma Syntax
+There are two forms; both yield identical results:
+
+#+begin_example
+pragma <pragma-name> (<pragma-value>)
+pragma <pragma-name=<pragma-value>
+#+end_example
+
+In many pragmas, the argument is a boolean (1 for =yes true on=, 2 for =no
+false off=.  When pragma takes a keyword argument, it will usually also take a
+numeric equivalent as well (0 and "no" mean the same thing); many pragmas
+return the number rather than the keyword.  Keyword arguments can optionally
+appear in quotes.  Some pragmas take a string literal as their argument.
+
+A pragma may have an optional <schema-name> before the pragma name
+(=<schema-name>.<pragma-name>=).  The <schema-name> is the name of an
+=ATTACH=-ed database or "main" or "temp" for the main and the =TEMP= databases.
+If the optional schema name is omitted, "main" is assumed.
+
+** Pragma Functions
+PRAGMAs that return results and that have no side-effects can be accessed from
+ordinary SELECT statements as [[https://www.sqlite.org/vtab.html#tabfunc2][table-valued functions]].  For each participating
+PRAGMA, the corresponding table-valued function has the same name as the PRAGMA
+with a 7-character "pragma_" prefix.
+
+: PRAGMA index_info('idx52');
+: SELECT * FROM pragma_index_info('idx52')
+
+The advantage of the table-valued function format is that the query can return
+just a subset of the =PRAGMA= columns, can include a =WHERE= clause, can use
+aggregate functions, and the table-valued function can be just one of several
+data sources in a join.
+
+Table-valued functions exist only for PRAGMAs that return results and that have
+no side-effects.  The table-valued functions for PRAGMA feature was added in
+SQLite version 3.16.0 (2017-01-02).  Prior versions of SQLite cannot use this
+feature.
+
+** List Of PRAGMAs
+- https://www.sqlite.org/pragma.html
 
 * SQLite Programming Interfaces
 ** SQLite Java
@@ -6975,100 +7062,8 @@ node delete.js
 
 The output showed that one row has been deleted successfully.
 
-* PRAGMA Statements
-- [[https://www.sqlite.org/pragma.html][PRAGMA Statements in Documentation]]
-
-
-#+cindex:PRAGMA statement
-The =PRAGMA= statement is an SQL extension specific to SQLite and used to
-modify the operation of the SQLite library or to query the SQLite library for
-internal (non-table) data.  The PRAGMA statement is issued using the same
-interface as other SQLite commands (e.g. =SELECT=, =INSERT=) but is different
-in the following important respects:
-
-- Specific pragma statements may be removed and others added in future releases
-  of SQLite.  There is no guarantee of backwards compatibility.
-
-- No error messages are generated if an unknown pragma is issued.  Unknown
-  pragmas are simply ignored.  This means if there is a typo in a pragma
-  statement the library does not inform the user of the fact.
-
-- Some pragmas take effect during the SQL compilation stage, not the execution
-  stage.
-
-- The pragma command is specific to SQLite and is not compatible with any other
-  SQL database engine.
-
-** Pragma Syntax
-There are two forms; both yield identical results:
-
-#+begin_example
-pragma <pragma-name> (<pragma-value>)
-pragma <pragma-name=<pragma-value>
-#+end_example
-
-In many pragmas, the argument is a boolean (1 for =yes true on=, 2 for =no
-false off=.  When pragma takes a keyword argument, it will usually also take a
-numeric equivalent as well (0 and "no" mean the same thing); many pragmas
-return the number rather than the keyword.  Keyword arguments can optionally
-appear in quotes.  Some pragmas take a string literal as their argument.
-
-A pragma may have an optional <schema-name> before the pragma name
-(=<schema-name>.<pragma-name>=).  The <schema-name> is the name of an
-=ATTACH=-ed database or "main" or "temp" for the main and the =TEMP= databases.
-If the optional schema name is omitted, "main" is assumed.
-
-** Pragma Functions
-PRAGMAs that return results and that have no side-effects can be accessed from
-ordinary SELECT statements as [[https://www.sqlite.org/vtab.html#tabfunc2][table-valued functions]].  For each participating
-PRAGMA, the corresponding table-valued function has the same name as the PRAGMA
-with a 7-character "pragma_" prefix.
-
-: PRAGMA index_info('idx52');
-: SELECT * FROM pragma_index_info('idx52')
-
-The advantage of the table-valued function format is that the query can return
-just a subset of the =PRAGMA= columns, can include a =WHERE= clause, can use
-aggregate functions, and the table-valued function can be just one of several
-data sources in a join.
-
-Table-valued functions exist only for PRAGMAs that return results and that have
-no side-effects.  The table-valued functions for PRAGMA feature was added in
-SQLite version 3.16.0 (2017-01-02).  Prior versions of SQLite cannot use this
-feature.
-
-** List Of PRAGMAs
-- https://www.sqlite.org/pragma.html
-
 * SQLite Resources
 - http://www.sqlitetutorial.net/sqlite-resources/
-
-** SQLite useful links
-
-** SQLite interfaces
-
-** SQLite GUI tools
-
-* Command Line Shell For SQLite
-- https://www.sqlite.org/cli.html
-
-* SQLite Advanced Tutorials
-
-** SQLite Window Frame
-
-** SQLite =CUME_DIST=
-
-** SQLite =PERCENT_RANK=
-
-** SQLite =DENSE_RANK=
-
-** SQLite =NTILE=
-
-** SQLite =NTH_VALUE=
-
-** SQLite =LAST_VALUE=
-
-** SQLite =FIRST_VALUE=
 
 * List of Figures
 :PROPERTIES:
