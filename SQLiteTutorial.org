@@ -1,8 +1,8 @@
 # -*- mode:org; fill-column:79; -*-
 #+title:SQLite Tutorial
 #+subtitle:{{{version}}}
-#+date:2019-07-06 08:41
-#+macro:version Version 0.0.21 {{{date}}}
+#+date:2019-07-06 09:41
+#+macro:version Version 0.0.22 {{{date}}}
 * Introduction
 - [[https://www.sqlite.org/index.html][SQLite Home]]
 - [[https://www.sqlite.org/docs.html][SQLite Documentation]]
@@ -4023,14 +4023,6 @@ ALTER TABLE new_table RENAME TO old_table;
 COMMIT;
 #+end_src
 
-*** SQLite =AUTOINCREMENT= Attribute
-- http://www.sqlitetutorial.net/sqlite-autoincrement/
-
-- SQLite AUTOINCREMENT ::
-
-     explain how =AUTOINCREMENT= attribute works and why you should avoid using it.
-
-
 *** SQLite =ALTER TABLE= Statement
 - http://www.sqlitetutorial.net/sqlite-alter-table/
 
@@ -4039,6 +4031,138 @@ COMMIT;
      show you how to use modify the structure of an existing table
 
 
+#+cindex:@code{ALTER TABLE} statement
+Unlike SQL-standard and other database management systems, SQLite supports a
+very limited functionality of the =ALTER TABLE= statement.
+
+With SQLite ALTER TABLE statement, you can perform two actions:
+
+1. Rename a table.
+
+2. Add a new column to a table.
+
+
+{{{heading(Renaming a table)}}}
+
+#+cindex:@code{ALTER TABLE RENAME TO} statement
+To rename a table, you use the following =ALTER TABLE RENAME TO= statement:
+
+#+begin_src sql
+ALTER TABLE existing_table
+RENAME TO new_table;
+#+end_src
+
+There are some important points you should know before you rename a table:
+
+- The =ALTER TABLE= only renames a table within a database.  It cannot be used
+  to move the table between attached databases.
+
+- The database objects, such as indexes, and triggers that are associated with
+  the table are attached to the new table.
+
+- If a table is referenced by views or statements in triggers, you must
+  manually change the definition of views and triggers.
+
+
+{{{heading(Adding a new column to a table)}}}
+
+Another action you can perform with the SQLite =ALTER TABLE= statement is to
+add a new column to an existing table.  In this case, SQLite appends the new
+column at the end of the existing columns list.
+
+#+cindex:@code{ALTER TABLE ADD COLUMN} statement
+The following illustrates the syntax of =ALTER TABLE ADD COLUMN= statement:
+
+#+begin_src sql
+ALTER TABLE table
+ADD COLUMN column_definition;
+#+end_src
+
+There are some restrictions of the new column:
+
+- The new column cannot have a =UNIQUE= or =PRIMARY KEY= constraint.
+
+- If the new column has a =NOT NULL= constraint, you must specify a default
+  value for the column other than a =NULL= value.
+
+- The new column cannot have a default of =CURRENT_TIMESTAMP=, =CURRENT_DATE=,
+  and =CURRENT_TIME=, or an expression.
+
+- If the new column is a foreign key and the foreign key constraint is enabled,
+  the new column must accept a default value of =NULL=.
+
+
+{{{heading(Other actions)}}}
+
+If you want to perform other actions e.g., drop a column, rename a column,
+etc., you use the following steps:
+
+[[file:figs/SQLite-ALTER-TABLE-Steps.jpg]]
+
+#+begin_src sql
+PRAGMA foreign_keys=off;
+
+BEGIN TRANSACTION;
+
+ALTER TABLE table RENAME TO temp_table;
+
+CREATE TABLE table
+(
+   column_definition,
+   ...
+);
+
+INSERT INTO table (column_list)
+  SELECT column_list
+  FROM temp_table;
+
+DROP TABLE temp_table;
+
+COMMIT;
+
+PRAGMA foreign_keys=on;
+#+end_src
+
+{{{subheading(Drop Column Example)}}}
+
+SQLite does not support =ALTER TABLE DROP COLUMN= statement.  To do this, you
+need to use the steps above.
+
+For example, if you want to remove the location column of the equipment table,
+you need to perform the following steps:
+
+1. Begin transaction.
+2. Rename the equipment table to =temp_equipment= table.
+3. Recreate the equipment table without the location column.
+4. Copy rows from the =temp_equipment= table to the equipment table.
+5. Drop the =temp_equipment= table.
+6. Commit transaction.
+
+
+The following statements illustrate the steps above:
+
+#+begin_src sql
+BEGIN TRANSACTION;
+
+ALTER TABLE equipment RENAME TO temp_equipment;
+
+CREATE TABLE equipment (
+ name text NOT NULL,
+ model text NOT NULL,
+ serial integer NOT NULL UNIQUE
+);
+
+INSERT INTO equipment
+SELECT
+ name, model, serial
+FROM
+ temp_equipment;
+
+DROP TABLE temp_equipment;
+
+COMMIT;
+#+end_src
+
 *** SQLite =DROP TABLE= Statement
 - http://www.sqlitetutorial.net/sqlite-drop-table/
 
@@ -4046,6 +4170,36 @@ COMMIT;
 
      guide you how to remove a table from the database.
 
+
+#+cindex:@code{DROP TABLE} statement
+To remove a table in a database, you use SQLite =DROP TABLE= statement.  The
+statement is simple as follows:
+
+: DROP TABLE [IF EXISTS] [schema_name.]table_name;
+
+You specify the table name, which you want to remove, after the =DROP TABLE=
+clause.  SQLite allows you to drop one table at a time. To remove multiple
+tables, you need to issue multiple =DROP TABLE= statements.  If you remove a
+non-existent table, SQLite issues an error. If you use =IF EXISTS= option,
+SQLite removes the table only if the table exists, otherwise, it just ignores
+the statement and does nothing.  If you want to remove a table in a specific
+database, you use the =[schema_name.]= explicitly.
+
+In case the table has associated triggers and indexes, the =DROP TABLE=
+statement also removes them all.  The =DROP TABLE= statement performs an
+implicit =DELETE= statement before deleting the table.  However, the =DROP
+TABLE= statement removes the triggers associated with the table before
+performing the implicit =DELETE= statement; therefore, no triggers are fired.
+
+#+cindex:foreign key constraint, @code{DROP TABLE}
+If the foreign key constraint is enabled and you perform the =DROP TABLE=
+statement, before SQLite performs the implicit =DELETE statement, it invokes
+foreign key constraints check.  If the foreign key constraint is violated,
+SQLite issues an error message and will not drop the table.
+
+Notice that the =DROP TABLE= statement removes the table from the database and
+the file on disk completely.  *You cannot undo or recover from this action*.
+Therefore, you should perform the =DROP TABLE= statement with extra caution.
 
 *** SQLite =VACUUM= Command
 - http://www.sqlitetutorial.net/sqlite-vacuum/
