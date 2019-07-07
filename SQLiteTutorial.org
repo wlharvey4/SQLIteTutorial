@@ -1,8 +1,8 @@
 # -*- mode:org; fill-column:79; -*-
 #+title:SQLite Tutorial
 #+subtitle:{{{version}}}
-#+date:2019-07-06 22:11
-#+macro:version Version 0.0.30 {{{date}}}
+#+date:2019-07-06 22:27
+#+macro:version Version 0.0.31 {{{date}}}
 * Introduction
 - [[https://www.sqlite.org/index.html][SQLite Home]]
 - [[https://www.sqlite.org/docs.html][SQLite Documentation]]
@@ -6352,6 +6352,97 @@ If you know that a query only returns a very limited number of rows, it might
 be more convenient to use ~Statement#all~ to retrieve all rows at once.
 
 There is currently no way to abort execution!
+#+end_defmethod
+
+**** sqlite3 Control Flow
+#+cindex:execution flow
+#+cindex:parallel flow
+#+cindex:exclusive mode
+~node-sqlite3~ provides two functions to help control the execution flow of
+statements.  The /default mode/ is to execute statements /in parallel/.
+However, the ~Database#close~ method will always run in /exclusive mode/,
+meaning it waits until all previous queries have completed and ~node-sqlite3~
+will not run any other queries while a ~close~ is pending.
+
+{{{heading(Database.serialize() Method)}}}
+
+#+attr_texinfo: :options Database serialize ([callback])
+#+begin_defmethod
+Puts the ~Database~ into serialized execution mode.  This means that at most
+one ~Statement~ object can execute a query at a time.  Other statements wait in
+a queue until the previous statements are executed.
+
+- CALLBACK :: [optional] 
+
+              If a CALLBACK is provided, it will be called immediately.  All
+              database queries scheduled in that CALLBACK will be serialized.
+              After the function returns, the database is set back to its
+              original mode again.  However, if you call it without a function
+              parameter, the execution mode setting is sticky and won't change
+              until the next call to ~Database#parallelize~.
+
+
+Calling ~Database#serialize()~ within nested functions is safe.
+
+#+begin_src js -n
+// Queries scheduled here will run in parallel.
+
+db.serialize(function() {
+  // Queries scheduled here will be serialized.
+  db.serialize(function() {
+    // Queries scheduled here will still be serialized.
+  });
+  // Queries scheduled here will still be serialized.
+});
+
+// Queries scheduled here will run in parallel again.
+#+end_src
+
+*Note* that queries /not/ scheduled directly in the CALLBACK function are not
+necessarily serialized:
+
+#+begin_src js -n
+db.serialize(function() {
+  // These two queries will run sequentially.
+  db.run("CREATE TABLE foo (num)");
+  db.run("INSERT INTO foo VALUES (?)", 1, function() {
+    // These queries will run in parallel and the second query will probably
+    // fail because the table might not exist yet.
+    db.run("CREATE TABLE bar (num)");
+    db.run("INSERT INTO bar VALUES (?)", 1);
+  });
+});
+#+end_src
+#+end_defmethod
+
+{{{heading(Database.parallize() Method)}}}
+
+#+attr_texinfo: :options Database parallize ([callback])
+#+begin_defmethod
+Puts the ~Database~ into parallelized execution mode.  This means that queries
+scheduled will be run in parallel.
+
+- CALLBACK ::  [optional]
+
+              If a CALLBACK is provided, it will be called immediately.  All
+              database queries scheduled in that CALLBACK will run
+              parallelized.  After the function returns, the database is set
+              back to its original mode again.  However, if you call it without
+              a function parameter, the execution mode setting is sticky and
+              won't change until the next call to ~Database#serialize~.
+
+
+Calling ~Database#parallelize()~ within nested functions is safe:
+
+#+begin_src js -n
+db.serialize(function() {
+   // Queries scheduled here will be serialized.
+   db.parallelize(function() {
+     // Queries scheduled here will run in parallel.
+   });
+   // Queries scheduled here will be serialized again.
+});
+#+end_src
 #+end_defmethod
 
 *** Connect To an SQLite Database Using Node.js
