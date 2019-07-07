@@ -1,8 +1,8 @@
 # -*- mode:org; fill-column:79; -*-
 #+title:SQLite Tutorial
 #+subtitle:{{{version}}}
-#+date:2019-07-06 17:28
-#+macro:version Version 0.0.29 {{{date}}}
+#+date:2019-07-06 22:11
+#+macro:version Version 0.0.30 {{{date}}}
 * Introduction
 - [[https://www.sqlite.org/index.html][SQLite Home]]
 - [[https://www.sqlite.org/docs.html][SQLite Documentation]]
@@ -5865,6 +5865,7 @@ db.close();
 #+end_src
 
 *** Node.js ~sqlite3~ API
+#+cindex:API, sqlite3
 **** sqlite3 Main Methods
 
 {{{heading(Database Constructor)}}}
@@ -5923,23 +5924,20 @@ way to reset this.  See the wiki page on debugging for more information.
 #+begin_defmethod
 Closes the database.
 
-- CALLBACK :: [optional] If provided, this function will be called when the
-              database was closed successfully or when an error occurred.
+- CALLBACK :: ~function (err) {}~
 
-  The first argument is an error object. When it is =null=, closing succeeded.
+              [optional] If provided, this function will be called when the database was
+              closed successfully or when an error occurred.
 
-  If no callback is provided and an error occurred, an =error= event with the
-              =error= object as the only parameter will be emitted on the
-              database object.
+              The first argument is an error object. When it is =null=, closing
+              succeeded.  If no callback is provided and an error occurred, an
+              =error= event with the =error= object as the only parameter will
+              be emitted on the database object.
 
-  If closing succeeded, a =close= event with no parameters is emitted,
+              If closing succeeded, a =close= event with no parameters is emitted,
               regardless of whether a callback was provided or not.
 
-  : function (err) { if (err) { ... } else { ... } }
-
-- Example ::
-
-             : db.close();
+- Example :: ~db.close();~
 #+end_defmethod
 
 {{{heading(Database.configure() Method)}}}
@@ -5975,15 +5973,16 @@ Database object for which it was called to allow for function chaining.
 
 - SQL ::
 
-         The SQL query to run.  If the SQL query is invalid and a callback was
+         The SQL query to run.  If the SQL query is invalid and a CALLBACK was
          passed to the function, it is called with an =error= object containing
-         the error message from SQLite.  If no callback was passed and
+         the error message from SQLite.  If no CALLBACK was passed and
          preparing fails, an =error= event will be emitted on the underlying
          =Statement= object.
 
-- PARAM :: [optional] When the SQL statement contains placeholders, you can
-           pass them in here.  They will be bound to the statement before it is
-           executed.
+- PARAM :: [optional]
+
+           When the SQL statement contains placeholders, you can pass them in
+           here.  They will be bound to the statement before it is executed.
 
   There are three ways of passing bind parameters:
 
@@ -6026,22 +6025,28 @@ Database object for which it was called to allow for function chaining.
     error will be thrown.  Additional bind parameters after an array or object
     will be ignored.
 
-- CALLBACK :: [optional] If given, it will be called when an error occurs
-              during any step of the statement preparation or execution, and
-              after the query has run.
+- <<db-run-callback>>CALLBACK :: [optional] ~function(err) {}~
 
-  - If an error occurs, the first (and only) parameter will be an =error=
-    object containing the error message.
+              If given, it will be called when an error occurs during any step
+              of the statement preparation or execution, and after the query
+              has run.
 
-  - If execution is successful, the first parameter is =null=.
+              If an error occurs, the first (and only) parameter will be an
+              =error= object containing the error message.
 
-  - The context of the function (the ~this~ object inside the function) is the
-    statement object.  If execution is successful, the ~this~ object will
-    contain two properties named =lastID= and =changes=, which contain the
-    value of the last inserted row ID and the number of rows affected by this
-    query, respectively.
+              If execution is successful, the first parameter is =null=.
 
-  - Note that =lastID= only contains valid information when the query was a
+              - ~this.lastID~ :: the value of the last inserted row ID
+
+              - ~this.changes~ :: the number of rows affected by the query
+
+              The context of the function (the ~this~ object inside the
+              function) is the =Statement= object.  If execution is successful,
+              the ~this~ object will contain two properties named =lastID= and
+              =changes=, which contain the value of the last inserted row ID
+              and the number of rows affected by this query, respectively.
+
+  - *Note* that =lastID= only contains valid information when the query was a
     successfully completed =INSERT= statement and =changes= only contains valid
     information when the query was a successfully completed =UPDATE= or
     =DELETE= statement.  In all other cases, the content of these properties is
@@ -6049,7 +6054,7 @@ Database object for which it was called to allow for function chaining.
     method that sets these two values; all other query methods such as ~.all()~
     or ~.get()~ don't retrieve these values.
 
-  - Note that it is not possible to run the statement again because it is
+  - *Note* that it is not possible to run the statement again because it is
     automatically finalized after running for the first time.  Any subsequent
     attempts to run the statement again will fail.
 #+end_defmethod
@@ -6065,10 +6070,13 @@ allow for function chaining.
 The PARAMETERS are the same as the ~Database#run~ function, with the following
 differences:
 
-- CALLBACK ::
+- CALLBACK :: [optional] ~function (err, row) {}~
 
-              The signature of the callback is ~function(err, row) {}~.  If the
-              result set is empty, the second parameter is =undefined=,
+              - ~row~ :: object containing the values of the first row, with
+                         the property names correspondent to the column names
+                         of the result set.
+
+              If the result set is empty, the second parameter is =undefined=,
               otherwise it is an object containing the values for the first
               row.  The property names correspond to the column names of the
               result set.  It is impossible to access them by column index; the
@@ -6087,19 +6095,18 @@ for function chaining.
 The PARAMETERS are the same as the ~Database#run~ function, with the following
 differences:
 
-- CALLBACK ::
+- CALLBACK :: [optional] ~function (err, rows) {}~
 
-              The signature of the callback is ~function(err, rows) {}~.
-              ~rows~ is an array.  If the result set is empty, it will be an
-              empty array, otherwise it will have an object for each result row
-              which in turn contains the values of that row, like the
-              ~Database#get~ function.
+              - ~rows~ :: is an array.  If the result set is empty, it will be
+                          an empty array; otherwise it will have an object for
+                          each result row which in turn contains the values of
+                          that row, like the ~Database#get~ function.
 
-              Note that it first retrieves all result rows and stores them in
-              memory.  For queries that have potentially large result sets, use
-              the ~Database#each~ function to retrieve all rows or
-              ~Database#prepare~ followed by multiple ~Statement#get~ calls to
-              retrieve a previously unknown amount of rows.
+
+*Note* that it first retrieves all result rows and stores them in memory.  For
+queries that have potentially large result sets, use the ~Database#each~
+function to retrieve all rows or ~Database#prepare~ followed by multiple
+~Statement#get~ calls to retrieve a previously unknown amount of rows.
 #+end_defmethod
 
 {{{heading(Database.each() Method)}}}
@@ -6113,20 +6120,24 @@ function chaining.
 The PARAMETERS are the same as the ~Database#run~ function, with the following
 differences:
 
-- ROW-CALLBACK ::
+- SQL: string of queries to run
 
-              The signature of the callback is ~function(err, row) {}~.  If the
-              result set succeeds but is empty, the CALLBACK is never
-              called.  In all other cases, the CALLBACK is called once for every
-              retrieved row.  The order of calls correspond exactly to the order
-              of rows in the result set.
+- PARAMS :: [optional] bind parameters
 
-- COMPLETION-CALLBACK ::
+- ROW-CALLBACK :: [optional] ~function (err, row) {}~
+
+                  If the result set succeeds but is empty, the CALLBACK is never
+                  called.  In all other cases, the CALLBACK is called once for
+                  every retrieved row.  The order of calls correspond exactly
+                  to the order of rows in the result set.
+
+- COMPLETION-CALLBACK :: [optional] ~function (err, rows) {}~
+
+     - ~rows~ :: number of retrieved rows
 
      After all ROW-CALLBACKS are called, the COMPLETION-CALLBACK will be called
-     if present.  It's signature is ~function(err, rows) {}~.  The first
-     argument is an error object, and the second argument is the number of
-     retrieved rows.
+     if present.  The first argument is an =error= object, and the second
+     argument is the number of retrieved rows.
 
 
 If you specify only one function, it will be treated as ROW-CALLBACK; if you
@@ -6148,12 +6159,17 @@ The function returns the ~Database~ object to allow for function chaining.  If a
 query fails, no subsequent statements will be executed (wrap it in a
 transaction if you want all or none to be executed).
 
-After all statements have been executed successfully, or when an error occurs,
-the CALLBACK function is called, with the first parameter being either =null=
-or an =error= object.
+- SQL :: string of queries to run
 
-When no CALLBACK is provided and an error occurs, an =error= event will be
-emitted on the ~Database~ object.
+- CALLBACK :: [optional] ~function (err) {}~
+
+              After all statements have been executed successfully, or when an
+              error occurs, the CALLBACK function is called, with the first
+              parameter being either =null= or an =error= object.
+
+              When no CALLBACK is provided and an error occurs, an =error=
+              event will be emitted on the ~Database~ object.
+
 
 *Note*: This function will only execute statements up to the first =NULL=
 byte.  Comments are not allowed and will lead to runtime errors.
@@ -6161,17 +6177,182 @@ byte.  Comments are not allowed and will lead to runtime errors.
 
 {{{heading(Database.prepare() Method)}}}
 
-#+attr_texinfo: :options Database prepare (sql, [param, ...], [callback])
-#+begin_defmethod
-Prepares the SQL statement and optionally binds the specified parameters and
+#+attr_texinfo: :options Database Statement prepare (sql, [param, ...], [callback])
+#+begin_deftypemethod
+Prepares the SQL statement and optionally binds the specified PARAMETERS and
 calls the CALLBACK when done.  The function returns a ~Statement~ object.
 
-When preparing was successful, the first and only argument to the CALLBACK is
-=null=; otherwise it is the =error= object.  When bind parameters are supplied,
-they are bound to the prepared statement before calling the CALLBACK.
+- SQL :: string of queries to run
+
+- PARAMS :: [optional] parameters to bind
+
+- CALLBACK :: [optional] ~function (err) {}~
+
+              When preparing was successful, the first and only argument to the
+              CALLBACK is =null=; otherwise it is the =error= object.  When
+              bind parameters are supplied, they are bound to the prepared
+              statement before calling the CALLBACK.
+#+end_deftypemethod
+
+**** sqlite3 Statement Methods
+
+{{{heading(Statement.bind() Method)}}}
+
+#+attr_texinfo: :options Statement bind ([param, ...], [callback])
+#+begin_defmethod
+Binds PARAMETERS to the prepared statement and calls the CALLBACK when done or
+when an error occurs.  The function returns the Statement object to allow for
+function chaining.
+
+- PARAMETERS :: [optional] parameters to bind
+
+                Binding PARAMETERS with this function completely resets the
+                statement object and row cursor and removes all previously
+                bound parameters, if any.
+
+- CALLBACK :: [optional] ~function (err) {}~
+
+              The first and only argument to the CALLBACK is =null= when
+              binding is successful; otherwise it is the =error= object.
 #+end_defmethod
 
-**** Statement
+{{{heading(Statement.reset() Method)}}}
+
+#+attr_texinfo: :objects Statement reset ([callback])
+#+begin_defmethod
+Resets the row cursor of the statement and preserves the parameter bindings.
+Use this function to re-execute the same query with the same bindings.  The
+function returns the ~Statement~ object to allow for function chaining.
+
+- CALLBACK :: [optional] ~function (null) {}~
+
+              The CALLBACK will be called after the reset is complete.  This
+              action will never fail and will always return =null= as the first
+              and only callback parameter.
+#+end_defmethod
+
+{{{heading(Statement.finalize() Method)}}}
+
+#+attr_texinfo: :options Statement finalize ([callback])
+#+begin_defmethod
+Finalizes the statement.  This is typically optional, but if you experience
+long delays before the next query is executed, explicitly finalizing your
+statement might be necessary.  This might be the case when you run an exclusive
+query (see section Control Flow).  After the statement is finalized, all
+further function calls on that ~Statement~ object will throw errors.
+#+end_defmethod
+
+{{{heading(Statement.run() Method)}}}
+
+#+attr_texinfo: :options Statement run ([param, ...], [callback])
+#+begin_defmethod
+Binds PARAMETERS and executes the statement.  The function returns the
+Statement object to allow for function chaining.
+
+- PARAMETERS :: [optional] parameters to bind
+
+                If you specify bind PARAMETERS, they will be bound to the
+                statement before it is executed.  Note that the bindings and
+                the row cursor are reset when you specify even a single bind
+                parameter.
+
+- CALLBACK :: [optional] ~function (err) {}~
+
+              The CALLBACK behavior is identical to the [[db-run-callback][~Database#run~ method]]
+              with the difference that the statement will not be finalized
+              after it is run.  This means you can run it multiple times.
+#+end_defmethod
+
+{{{heading(Statement.get() Method)}}}
+
+#+attr_texinfo: :options Statement get ([param, ...], [callback])
+#+begin_defmethod
+Binds PARAMETERS, executes the statement and retrieves the first result row.
+The function returns the =Statement= object to allow for function chaining.
+
+- PARAMETERS :: [optional]
+
+                The PARAMETERS are the same as the ~Statement#run~ function,
+                with the following differences:
+
+- CALLBACK :: [optional] ~function(err, row) {}~
+
+              If the result set is empty, the second parameter is undefined;
+              otherwise it is an object containing the values for the first
+              row.  Like with ~Statement#run~, the statement will not be
+              finalized after executing this function.
+
+
+#+cindex:locked, database
+Using this method can leave the database locked, as the database awaits further
+calls to ~Statement#get~ to retrieve subsequent rows.  To inform the database
+that you are finished retrieving rows, you should either finalize (with
+~Statement#finalize~) or reset (with ~Statement#reset~) the statement.
+#+end_defmethod
+
+{{{heading(Statement.all() Method)}}}
+
+#+attr_texinfo: :options Statement all ([param, ...], [callback])
+#+begin_defmethod
+Binds PARAMETERS, executes the statement and calls the CALLBACK with all result
+rows.  The function returns the =Statement= object to allow for function
+chaining.
+
+- PARAMETERS :: [optional]
+
+                The PARAMETERS are the same as the ~Statement#run~ function,
+                with the following differences:
+
+- CALLBACK :: [optional] ~function(err, rows) {}~
+
+              If the result set is empty, the second parameter is an empty
+              array, otherwise it contains an object for each result row which
+              in turn contains the values of that row.
+
+
+Like with ~Statement#run~, the statement will not be finalized after executing
+this function.
+#+end_defmethod
+
+{{{heading(Statement.each() Method)}}}
+
+#+attr_texinfo: :options Statement each ([param, ...], [row-callback], [completion-callback])
+#+begin_defmethod
+Binds PARAMETERS, executes the statement and calls the CALLBACK for each result
+row.  The function returns the =Statement= object to allow for function
+chaining.
+
+- PARAMETERS :: [optional]
+
+                The parameters are the same as the ~Statement#run~ function,
+                with the following differences:
+
+- ROW-CALLBACK :: [optional] ~function(err, row) {}~
+
+                  If the result set succeeds but is empty, the ROW-CALLBACK is
+                  never called.  In all other cases, the ROW-CALLBACK is called
+                  once for every retrieved row.  The order of calls correspond
+                  exactly to the order of rows in the result set.
+
+- COMPLETION-CALLBACK :: [optional] ~function(err, rows) {}~
+
+              After all row callbacks were called, the COMPLETION-CALLBACK will
+              be called if present.  The first argument is an =error= object,
+              and the second argument is the number of retrieved rows.
+
+
+If you specify only one function, it will be treated as ROW-CALLBACK; if you
+specify two, the first (== second to last) function will be the ROW-CALLBACK,
+the last function will be the COMPLETION-CALLBACK.
+
+Like with ~Statement#run~, the statement will not be finalized after executing
+this function.
+
+If you know that a query only returns a very limited number of rows, it might
+be more convenient to use ~Statement#all~ to retrieve all rows at once.
+
+There is currently no way to abort execution!
+#+end_defmethod
 
 *** Connect To an SQLite Database Using Node.js
 - http://www.sqlitetutorial.net/sqlite-nodejs/connect/
