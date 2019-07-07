@@ -1,8 +1,8 @@
 # -*- mode:org; fill-column:79; -*-
 #+title:SQLite Tutorial
 #+subtitle:{{{version}}}
-#+date:2019-07-06 22:53
-#+macro:version Version 0.0.32 {{{date}}}
+#+date:2019-07-06 22:58
+#+macro:version Version 0.0.33 {{{date}}}
 * Introduction
 - [[https://www.sqlite.org/index.html][SQLite Home]]
 - [[https://www.sqlite.org/docs.html][SQLite Documentation]]
@@ -7760,14 +7760,12 @@ The output showed that one row has been deleted successfully.
 :PROPERTIES:
 :unnumbered: t
 :END:
-
 #+texinfo:@listoffloats Figure
 
 * List of Programs
 :PROPERTIES:
 :unnumbered: t
 :END:
-
 #+texinfo:@listoffloats Listing
 
 * Index
@@ -7775,15 +7773,19 @@ The output showed that one row has been deleted successfully.
 :unnumbered: t
 :index:    cp
 :END:
+
 * Function Index
 :PROPERTIES:
 :unnumbered: t
 :index:    fn
 :END:
+
 * Export Options                                                   :noexport:
-** HTML Export Options
+#+options: H:4
 #+options: html-link-use-abs-url:nil html-postamble:auto html-preamble:t
 #+options: html-scripts:t html-style:t html5-fancy:t tex:t date:nil
+
+** HTML Export Options
 #+html_doctype: html5
 #+html_container: div
 #+description:
@@ -7799,13 +7801,10 @@ The output showed that one row has been deleted successfully.
 #+latex_header:
 
 ** Texinfo Export Options
-#+options: toc:nil H:4
-#+texinfo_filename:sqlite-tutorial.info
+#+texinfo_filename:sqlite_tutorial.info
 #+texinfo_class: info
 #+texinfo_header:
 #+texinfo_post_header:
-#+subtitle:
-#+subauthor:
 #+texinfo_dir_category: Databases
 #+texinfo_dir_title:SQLite Tutorial
 #+texinfo_dir_desc: Everything you need to know to start using SQLite effectively.
