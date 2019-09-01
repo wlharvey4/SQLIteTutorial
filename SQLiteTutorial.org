@@ -1,8 +1,8 @@
 # -*- mode:org; fill-column:79; -*-
 #+title:SQLite Tutorial
 #+subtitle:{{{version}}}
-#+date:2019-07-06 22:58
-#+macro:version Version 0.0.33 {{{date}}}
+#+date:2019-09-01 10:26
+#+macro:version Version 0.0.34 {{{date}}}
 * Introduction
 - [[https://www.sqlite.org/index.html][SQLite Home]]
 - [[https://www.sqlite.org/docs.html][SQLite Documentation]]
@@ -7755,6 +7755,107 @@ The output showed that one row has been deleted successfully.
 
 * SQLite Resources
 - http://www.sqlitetutorial.net/sqlite-resources/
+
+* SQLite with Node
+Explore how to apply NodeJS to make your web content come to life - explore how
+to create a local database.
+
+- how to write NodeJS
+- Explore various useful package for node
+- Setup a local SQLlite instance running a database
+- Explore how nodeJS works
+- See how to setup a localhost server
+
+
+{{{heading(How to setup a local database using node)}}}
+
+Step-by-step instructions on how to use Node.js to install packages and setup a
+local SQLite database to use for your web applications; how to get data and add
+data to the database.
+
+{{{subheading(Coverage of:)}}}
+
+- setup of express to run local machine on your computer
+- download and setup of SQLite database
+- useful packages like nodemon and MD5
+- inserting data to your local database
+- query database for results
+- setup of paths for files
+- use of body parser to get post data
+- submitting of form data to database
+- setup of basic app to interact with database
+
+
+** Local Database Local Host with Express
+
+*** Introduction to Local Database
+How to develop a local database, store data into the database, retrieve data
+back from the database using Node for the backend code and JavaScript AJAX
+requests for the front end code.
+
+*** Node DB Introduction
+Make sure you have a Terminal to work with.
+
+*** Setup Node and Create App File and Install Express
+
+Make sure ~node~ and ~npm~ are both installed.  Install a new package into
+~nodedb/~.  Add ~express~ to the package.
+
+#+cindex:app root @file{nodedb/}
+- The app root will be at ~nodedb/~.
+
+  #+pindex:app file @file{app.js}
+- The app file will be called ~nodedb/app.js~.
+
+  #+cindex:@file{express} package
+- The ~express~ package will be installed into ~nodedb/~.
+
+
+{{{heading(Package Installation)}}}
+
+#+name:create-app-root-and-app-file
+#+begin_src sh :results output :exports results
+mkdir nodedb
+cd nodedb
+touch app.js
+yarn init -yp
+yarn add express
+#+end_src
+
+{{{heading(Current App Package Structure)}}}
+
+#+name:show-package-tree
+#+begin_src sh :results output :exports results
+tree -L 2 nodedb
+#+end_src
+
+** Introduction to Setting Up a Local Machine Database
+
+*** Local Server Setup
+
+*** Nodemon Package
+
+*** Install SQLite
+
+*** Insert Data
+
+*** DB Connection
+
+*** Query the Database
+
+*** List Users on Webpage
+
+*** User by ID
+
+*** Create New User
+
+*** Create New User 2
+
+*** Add New User
+
+*** Code Review
+
+** Additional Information
 
 * List of Figures
 :PROPERTIES:
